@@ -1,8 +1,10 @@
 CMSIS = ../../libs/CMSIS_5
 
+SRCS := ../../include/system_stm32f4xx.c $(SRCS)
+
 OBJS =  $(addsuffix .o, $(basename $(SRCS)))
 INCLUDES  = -I.
-INCLUDES += -I../..//include
+INCLUDES += -I../../include
 INCLUDES += -I$(CMSIS)/CMSIS/Core/Include
 
 CFLAGS += $(CDEFS)
@@ -81,8 +83,12 @@ debug:
 	--eval-command="layout regs" \
 	 $(TARGET).elf
 
+disass: $(TARGET).elf
+	$(OBJDUMP) -xd $(TARGET).elf
+
 clean:
 	@echo "Cleaning" $(TARGET)
+	@rm -f $(OBJS)
 	@rm -f $(TARGET).elf
 	@rm -f $(TARGET).bin
 	@rm -f $(TARGET).map
@@ -90,4 +96,4 @@ clean:
 	@rm -f $(TARGET).lst
 	@rm -f *.o
 
-.PHONY: all build size clean burn debug
+.PHONY: all build size clean burn debug disass

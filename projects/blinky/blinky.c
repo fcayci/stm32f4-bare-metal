@@ -18,9 +18,7 @@
 /*************************************************
 * function declarations
 *************************************************/
-void Reset_Handler(void);
 void Default_Handler(void);
-void _init_data(void);
 int main(void);
 void delay(volatile uint32_t);
 
@@ -54,72 +52,6 @@ void (* const vector_table[])(void) = {
 	Default_Handler,                    /* 0x038 PendSV        */
 	Default_Handler                     /* 0x03C SysTick       */
 };
-
-/*************************************************
-* entry point for the program
-* initializes data and bss sections and calls main program
-*************************************************/
-void Reset_Handler(void)
-{
-	/* initialize data and bss sections */
-	_init_data();
-
-	/* FPU settings */
-	#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-	SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
-	#endif
-
-  	/* Reset the RCC clock configuration to the default reset state */
-  	/* Set HSION bit */
-  	RCC->CR |= (1 << 0);
-
-	/* Reset CFGR register */
-	RCC->CFGR = 0x00000000;
-
-	/* Reset HSEON (16), CSSON (19) and PLLON (24) bits */
-	RCC->CR &= ~(uint32_t)((1 << 16) | (1 << 19) | (1 << 24));
-
-	/* Reset PLLCFGR register to reset value*/
-	RCC->PLLCFGR = 0x24003010;
-
-	/* Reset HSEBYP bit */
-	RCC->CR &= ~(uint32_t)(1 << 18);
-
-	/* Disable all interrupts */
-	RCC->CIR = 0x00000000;
-
-  	/* Configure the Vector Table location add offset address */
-	#ifdef VECT_TAB_SRAM
-	SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
-	#else
-	SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
-	#endif
-
-	/* call main function */
-	main();
-
-	/* wait forever */
-	for (;;);
-}
-
-/*************************************************
-* Copy the data contents from LMA to VMA
-* Initializes data and bss sections
-*************************************************/
-void _init_data(void)
-{
-	extern unsigned long __etext, __data_start__, __data_end__, __bss_start__, __bss_end__;
-	unsigned long *src = &__etext;
-	unsigned long *dst = &__data_start__;
-
-	/* ROM has data at end of text; copy it.  */
-	while (dst < &__data_end__)
-		*dst++ = *src++;
-
-	/* zero bss.  */
-	for (dst = &__bss_start__; dst< &__bss_end__; dst++)
-		*dst = 0;
-}
 
 /*************************************************
 * default interrupt handler

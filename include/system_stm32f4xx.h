@@ -5,15 +5,14 @@
  extern "C" {
 #endif
 
-#define VECT_TAB_OFFSET  0x00
+#include "stm32f4xx.h"
 
-/* Clock PLLs for 407 chip */
-#ifdef STM32F407xx
-#define PLL_M	8
-#define PLL_Q 	7
-#define PLL_N 	336
-#define PLL_P 	2
-#endif
+void _init_data(void);
+void Reset_Handler(void);
+void reset_clock(void);
+void set_sysclk_to_168(void);
+/* bring main */
+extern int main(void);
 
 #ifdef __cplusplus
 }

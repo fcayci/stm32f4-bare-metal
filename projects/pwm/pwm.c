@@ -19,11 +19,8 @@
 /*************************************************
 * function declarations
 *************************************************/
-void Reset_Handler(void);
 void Default_Handler(void);
 void tim4_handler(void);
-void set_sysclk_to_max(void);
-void _init_data(void);
 int main(void);
 
 /*************************************************
@@ -139,112 +136,11 @@ void (* const vector_table[])(void) = {
 };
 
 /*************************************************
-* entry point for the program
-* initializes data and bss sections and calls main program
-*************************************************/
-void Reset_Handler(void)
-{
-	/* initialize data and bss sections */
-	_init_data();
-
-	/* FPU settings */
-	#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-	SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
-	#endif
-
-  	/* Reset the RCC clock configuration to the default reset state */
-  	/* Set HSION bit */
-  	RCC->CR |= (1 << 0);
-
-	/* Reset CFGR register */
-	RCC->CFGR = 0x00000000;
-
-	/* Reset HSEON (16), CSSON (19) and PLLON (24) bits */
-	RCC->CR &= ~(uint32_t)((1 << 16) | (1 << 19) | (1 << 24));
-
-	/* Reset PLLCFGR register to reset value*/
-	RCC->PLLCFGR = 0x24003010;
-
-	/* Reset HSEBYP bit */
-	RCC->CR &= ~(uint32_t)(1 << 18);
-
-	/* Disable all interrupts */
-	RCC->CIR = 0x00000000;
-
-  	/* Configure the Vector Table location add offset address */
-	#ifdef VECT_TAB_SRAM
-	SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal SRAM */
-	#else
-	SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET; /* Vector Table Relocation in Internal FLASH */
-	#endif
-
-	/* max system clock to 168 Mhz */
-	set_sysclk_to_max();
-
-	/* call main function */
-	main();
-
-	/* wait forever */
-	for (;;);
-}
-
-/*************************************************
-* Copy the data contents from LMA to VMA
-* Initializes data and bss sections
-*************************************************/
-void _init_data(void)
-{
-	extern unsigned long __etext, __data_start__, __data_end__, __bss_start__, __bss_end__;
-	unsigned long *src = &__etext;
-	unsigned long *dst = &__data_start__;
-
-	/* ROM has data at end of text; copy it.  */
-	while (dst < &__data_end__)
-		*dst++ = *src++;
-
-	/* zero bss.  */
-	for (dst = &__bss_start__; dst< &__bss_end__; dst++)
-		*dst = 0;
-}
-
-/*************************************************
 * default interrupt handler
 *************************************************/
 void Default_Handler(void)
 {
 	for (;;);  // Wait forever
-}
-
-/*************************************************
-* configure system clock to max
-*************************************************/
-void set_sysclk_to_max(void)
-{
-	/* Enable HSE */
-	RCC->CR |= ((uint32_t)RCC_CR_HSEON);
-	/* Wait till HSE is ready */
-	while(!(RCC->CR & RCC_CR_HSERDY));
-	/* Select regulator voltage output Scale 1 mode */
-	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-	PWR->CR |= PWR_CR_VOS;
-	RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
-	RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;
-	RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;
-
-	RCC->PLLCFGR = PLL_M | (PLL_N << 6) | (((PLL_P >> 1) -1) << 16) |
-		(RCC_PLLCFGR_PLLSRC_HSE) | (PLL_Q << 24);
-	/* Enable the main PLL */
-	RCC->CR |= RCC_CR_PLLON;
-	/* Wait till the main PLL is ready */
-	while((RCC->CR & RCC_CR_PLLRDY) == 0);
-	/* Configure Flash prefetch, Instruction cache, Data cache and wait state */
-	FLASH->ACR = FLASH_ACR_PRFTEN | FLASH_ACR_ICEN |FLASH_ACR_DCEN |FLASH_ACR_LATENCY_5WS;
-
-	/* Select the main PLL as system clock source */
-	RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-	RCC->CFGR |= RCC_CFGR_SW_PLL;
-	/* Wait till the main PLL is used as system clock source */
-	while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS ) != RCC_CFGR_SWS_PLL);
 }
 
 const uint32_t period = 5000;
@@ -276,6 +172,8 @@ void tim4_handler(void)
 *************************************************/
 int main(void)
 {
+	/* set system clock to 168 Mhz */
+	set_sysclk_to_168();
 
 	uint32_t duty = period/2;
 
