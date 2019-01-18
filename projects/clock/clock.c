@@ -145,17 +145,15 @@ void set_sysclk_to_hsi(void)
 	FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (0x0 << 0);
 }
 
+/* set sysclock to 84Mhz
+ * no need to touch M, N or Q
+ * PLL_P needs to be doubled
+ */
 void set_sysclk_to_84(void)
 {
 	reset_clock();
-	// Main PLL = N * (source_clock / M) / P
-	// HSE = 8 Mhz
-	// Target PLL = 168 Mhz (max)
-	// fCLK  =  N * (8M / M) / P
-	// 84Mhz = 336 * (8M / 8) / 4
-	uint32_t PLL_M = 8;
-	uint32_t PLL_Q = 7;
-	uint32_t PLL_N = 336;
+
+	#undef PLL_P
 	uint32_t PLL_P = 4;
 
 	/* Enable HSE (CR: bit 16) */

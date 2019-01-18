@@ -81,20 +81,11 @@ void reset_clock(void)
 
 /*************************************************
 * configure system clock to 168 Mhz
+* this is only tested on stm32f4 discovery board
 *************************************************/
 void set_sysclk_to_168(void)
 {
 	reset_clock();
-
-	// Main PLL = N * (source_clock / M) / P
-	// HSE = 8 Mhz
-	// Target PLL = 168 Mhz (max)
-	// fCLK =   N * (8M / M) / P
-	// 168M = 336 * (8M / 8) / 2
-	uint32_t PLL_M = 8;
-	uint32_t PLL_Q = 7;
-	uint32_t PLL_N = 336;
-	uint32_t PLL_P = 2;
 
 	/* Enable HSE (CR: bit 16) */
 	RCC->CR |= ((uint32_t) (1 << 16));
