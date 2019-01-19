@@ -229,40 +229,40 @@ int main(void)
 
 	while(1)
 	{
-			// increment i every time
-			// since we set up to 168Mhz in the
-			// beginning we can just start from 1
-			// reset when it reaches to 180
-			if (i > 179){
-				i = 0;
-			} else {
-				i++;
-			}
+		// increment i every time
+		// since we set up to 168Mhz in the
+		// beginning we can just start from 1
+		// reset when it reaches to 180
+		if (i > 179){
+			i = 0;
+		} else {
+			i++;
+		}
 
-			switch (i)
-			{
-				case 0: // 168 Mhz
-					set_sysclk_to_168();
-					break;
+		switch (i)
+		{
+			case 0: // 168 Mhz
+				set_sysclk_to_168();
+				break;
 
-				case 100: // 84 Mhz
-					set_sysclk_to_84();
-					break;
+			case 100: // 84 Mhz
+				set_sysclk_to_84();
+				break;
 
-				case 150: // 16 Mhz
-					set_sysclk_to_hsi();
-					break;
+			case 150: // 16 Mhz
+				set_sysclk_to_hsi();
+				break;
 
-				case 170: // 8 Mhz
-					set_sysclk_to_hse();
-					break;
+			case 170: // 8 Mhz
+				set_sysclk_to_hse();
+				break;
 
-				default:
-					break;
-			}
+			default:
+				break;
+		}
 
-			delay(500000);
-			GPIOD->ODR ^= 0xF000;
+		delay(500000);
+		GPIOD->ODR ^= 0xF000;
 	}
 
 	return 0;
