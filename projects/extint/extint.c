@@ -59,7 +59,7 @@ void (* const vector_table[])(void) = {
 	Default_Handler,                    /* 0x030 Debug Monitor */
 	0,                                  /* 0x034 Reserved      */
 	Default_Handler,                    /* 0x038 PendSV        */
-	0,                                  /* 0x03C SysTick       */
+	Default_Handler,                    /* 0x03C SysTick       */
 	0,							        /* 0x040 Window WatchDog Interrupt                                         */
 	0,        				            /* 0x044 PVD through EXTI Line detection Interrupt                         */
 	0,                                  /* 0x048 Tamper and TimeStamp interrupts through the EXTI line             */
