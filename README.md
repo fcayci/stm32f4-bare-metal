@@ -44,5 +44,6 @@ Run `make burn` from the project directory after `make`
 * [clock](projects/clock/) - Shows how to change clock frequencies on the fly
 * [math](projects/math/) - A simple sine function to test math library operation
 * [systick](projects/systick/) - Blinks LEDs using systick timer. Processor clock is set to max (168 Mhz)
+* [timer](projects/timer/) - Blinks LEDs one at a time using the Timer module and Timer interrupt
 * [pwm](projects/pwm/) - Fades an LED using pwm functionality using Timer module
 * [extint](projects/extint/) - External interrupt example using the on-board push-button
