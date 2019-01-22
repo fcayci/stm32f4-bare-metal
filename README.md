@@ -26,7 +26,7 @@ If everything is setup correctly, you should see the completed message.
 Cleaning blinky
 Building blinky.c
    text    data     bss     dec     hex filename
-    374       0       0     374     176 blinky.elf
+    366       0       0     366     16e blinky.elf
 Successfully finished...
 ```
 
