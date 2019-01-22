@@ -6,8 +6,7 @@ Some of the STM32F4xx family based processor headers are added in the `include` 
 ## Installation
 
 * Clone the project using `git clone --recurse-submodules https://github.com/fcayci/stm32f4-bare-metal`
-with the added CMSIS repo.
-
+with the included external tools/libraries such as CMSIS repo.
 * Install a compiler. You can get one free from [GNU ARM Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
 * Install programmer from [stlink](https://github.com/texane/stlink)
 * Install the make utility for Windows only from [MinGW and MSYS](http://www.mingw.org/)
