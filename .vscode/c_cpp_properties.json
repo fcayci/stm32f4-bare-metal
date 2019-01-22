@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "ARM",
+            "includePath": [
+                "${workspaceFolder}/include",
+                "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include"
+            ],
+            "defines": ["STM32F407xx", "__VFP_FP__"],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}/include",
+                    "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            },
+            "compilerPath": "arm-none-eabi-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
