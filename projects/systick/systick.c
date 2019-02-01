@@ -73,8 +73,8 @@ void Systick_Handler(void)
 {
 	if (tDelay != 0x00)
 	{
-    	tDelay--;
-  	}
+		tDelay--;
+	}
 }
 
 /*************************************************
