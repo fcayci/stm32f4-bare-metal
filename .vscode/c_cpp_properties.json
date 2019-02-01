@@ -4,14 +4,16 @@
             "name": "ARM",
             "includePath": [
                 "${workspaceFolder}/include",
-                "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include"
+                "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include",
+                "${workspaceRoot}/libs/libopencm3/include"
             ],
-            "defines": ["STM32F407xx", "__VFP_FP__"],
+            "defines": ["STM32F407xx", "__VFP_FP__", "__ARM_ARCH_7EM__"],
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
                     "${workspaceRoot}/include",
-                    "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include"
+                    "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include",
+                    "${workspaceRoot}/libs/libopencm3/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

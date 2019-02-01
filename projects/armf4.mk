@@ -3,7 +3,7 @@ CMSIS = ../../libs/CMSIS_5
 SRCS := ../../include/system_stm32f4xx.c $(SRCS)
 
 OBJS =  $(addsuffix .o, $(basename $(SRCS)))
-INCLUDES  = -I.
+INCLUDES += -I.
 INCLUDES += -I../../include
 INCLUDES += -I$(CMSIS)/CMSIS/Core/Include
 
@@ -11,7 +11,7 @@ CFLAGS += $(CDEFS)
 
 CFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
 CFLAGS += -O0 # optimization is off
-CFLAGS += -g0 # generate debug info
+CFLAGS += -g2 # generate debug info
 CFLAGS += -fno-common
 CFLAGS += -Wall # turn on warnings
 CFLAGS += -pedantic # more warnings
