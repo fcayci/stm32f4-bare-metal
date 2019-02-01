@@ -36,24 +36,24 @@ extern unsigned long __stack;
 // Vector table can be found on page 372 in RM0090
 __attribute__ ((section(".vectors")))
 void (* const vector_table[])(void) = {
-	(intfunc)((unsigned long)&__stack),	/* 0x000 Stack Pointer */
-	Reset_Handler,               		/* 0x004 Reset         */
-	Default_Handler,					/* 0x008 NMI           */
-	Default_Handler,                    /* 0x00C HardFaullt    */
+	(intfunc)((unsigned long)&__stack), /* 0x000 Stack Pointer */
+	Reset_Handler,                      /* 0x004 Reset         */
+	Default_Handler,                    /* 0x008 NMI           */
+	Default_Handler,                    /* 0x00C HardFault     */
 	Default_Handler,                    /* 0x010 MemManage     */
 	Default_Handler,                    /* 0x014 BusFault      */
 	Default_Handler,                    /* 0x018 UsageFault    */
-	0,                   			    /* 0x01C Reserved      */
-	0,     				                /* 0x020 Reserved      */
-	0,               			        /* 0x024 Reserved      */
-	0, 				                    /* 0x028 Reserved      */
+	0,                                  /* 0x01C Reserved      */
+	0,                                  /* 0x020 Reserved      */
+	0,                                  /* 0x024 Reserved      */
+	0,                                  /* 0x028 Reserved      */
 	Default_Handler,                    /* 0x02C SVCall        */
 	Default_Handler,                    /* 0x030 Debug Monitor */
 	0,                                  /* 0x034 Reserved      */
 	Default_Handler,                    /* 0x038 PendSV        */
 	Default_Handler,                    /* 0x03C SysTick       */
-	0,							        /* 0x040 Window WatchDog Interrupt                                         */
-	0,        				            /* 0x044 PVD through EXTI Line detection Interrupt                         */
+	0,                                  /* 0x040 Window WatchDog Interrupt                                         */
+	0,                                  /* 0x044 PVD through EXTI Line detection Interrupt                         */
 	0,                                  /* 0x048 Tamper and TimeStamp interrupts through the EXTI line             */
 	0,                                  /* 0x04C RTC Wakeup interrupt through the EXTI line                        */
 	0,                                  /* 0x050 FLASH global Interrupt                                            */
@@ -61,7 +61,7 @@ void (* const vector_table[])(void) = {
 	0,                                  /* 0x058 EXTI Line0 Interrupt                                              */
 	0,                                  /* 0x05C EXTI Line1 Interrupt                                              */
 	0,                                  /* 0x060 EXTI Line2 Interrupt                                              */
-	0,           					    /* 0x064 EXTI Line3 Interrupt                                              */
+	0,                                  /* 0x064 EXTI Line3 Interrupt                                              */
 	0,                                  /* 0x068 EXTI Line4 Interrupt                                              */
 	0,                                  /* 0x06C DMA1 Stream 0 global Interrupt                                    */
 	0,                                  /* 0x070 DMA1 Stream 1 global Interrupt                                    */
