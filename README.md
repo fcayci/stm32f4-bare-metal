@@ -46,3 +46,4 @@ Run `make burn` from the project directory after `make`
 * [timer](projects/timer/) - Blinks LEDs one at a time using the Timer module and Timer interrupt
 * [pwm](projects/pwm/) - Fades an LED using pwm functionality using Timer module
 * [extint](projects/extint/) - External interrupt example using the on-board push-button
+* [usb-vcp](projects/usb-vcp/) - USB Virtual COM Port implementation example using libopencm3 library
