@@ -1,8 +1,9 @@
 CMSIS = ../../libs/CMSIS_5
 
-SRCS := ../../include/system_stm32f4xx.c $(SRCS)
+SRCS += ../../include/system_stm32f4xx.c
 
-OBJS =  $(addsuffix .o, $(basename $(SRCS)))
+OBJS = $(SRCS:.c=.o)
+
 INCLUDES += -I.
 INCLUDES += -I../../include
 INCLUDES += -I$(CMSIS)/CMSIS/Core/Include
