@@ -3,7 +3,7 @@
         {
             "name": "ARM",
             "includePath": [
-                "${workspaceFolder}/include",
+                "${workspaceRoot}/include",
                 "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include",
                 "${workspaceRoot}/libs/libopencm3/include"
             ],
