@@ -3,8 +3,12 @@ SRCS = usb-vcp.c
 
 LINKER_SCRIPT = ../../flash/stm32f407.ld
 
-# Choose processor
+# Generate debug info
+DEBUG = 0
+
+# Set processor for libopencm3
 CDEFS  = -DSTM32F407xx
+
 # Enable FPU
 #CDEFS += -D__VFP_FP__
 

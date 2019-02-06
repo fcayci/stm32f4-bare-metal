@@ -2,7 +2,9 @@ CMSIS = ../../libs/CMSIS_5
 
 SRCS += ../../include/system_stm32f4xx.c
 
-OBJS = $(SRCS:.c=.o)
+#OBJS = $(SRCS:.c=.o)
+OBJS = $(addprefix ,$(notdir $(SRCS:.c=.o)))
+vpath %.c $(sort $(dir $(SRCS)))
 
 INCLUDES += -I.
 INCLUDES += -I../../include
@@ -12,7 +14,13 @@ CFLAGS += $(CDEFS)
 
 CFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
 CFLAGS += -O0 # optimization is off
-CFLAGS += -g2 # generate debug info
+
+ifeq ($(DEBUG), 1)
+CFLAGS += -g -gdwarf-2 # generate debug info
+# generate dependency info
+CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
+endif
+
 CFLAGS += -fno-common
 CFLAGS += -Wall # turn on warnings
 CFLAGS += -pedantic # more warnings
@@ -33,11 +41,13 @@ LDFLAGS += -mfloat-abi=softfp -mfpu=fpv4-sp-d16 # Soft FP
 
 LDFLAGS += -march=armv7e-m # processor setup
 LDFLAGS += -nostartfiles # no start files are used
-LDFLAGS += --specs=nosys.specs
+LDFLAGS += --specs=nano.specs
+#LDFLAGS += --specs=nosys.specs
 LDFLAGS += -Wl,--gc-sections # linker garbage collector
 LDFLAGS += -Wl,-Map=$(TARGET).map #generate map file
 LDFLAGS += -T$(LINKER_SCRIPT)
 LDFLAGS += $(LIBS)
+LDFLAGS += -lc -lnosys
 
 CROSS_COMPILE = arm-none-eabi-
 CC = $(CROSS_COMPILE)gcc
@@ -95,6 +105,7 @@ clean:
 	@rm -f $(TARGET).map
 	@rm -f $(TARGET).hex
 	@rm -f $(TARGET).lst
+	@rm -f *.d
 	@rm -f *.o
 
 .PHONY: all build size clean burn debug disass

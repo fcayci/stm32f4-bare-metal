@@ -3,6 +3,9 @@ SRCS = pwm.c
 
 LINKER_SCRIPT = ../../flash/stm32f407.ld
 
+# Generate debug info
+DEBUG = 0
+
 # Choose processor
 CDEFS  = -DSTM32F407xx
 # Enable FPU
