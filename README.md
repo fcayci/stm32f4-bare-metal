@@ -68,3 +68,4 @@ Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Stu
 * [pwm](projects/pwm/) - Fades an LED using pwm functionality using Timer module
 * [extint](projects/extint/) - External interrupt example using the on-board push-button
 * [usb-vcp](projects/usb-vcp/) - USB Virtual COM Port implementation example. It depends on the [libopencm3](https://github.com/libopencm3/libopencm3) library for the USB stack
+* [dac](projects/dac/) - On-chip digital to analog converter operation
