@@ -14,6 +14,12 @@
  *    Connect it as you would to a serial port.
  *    (putty, screen, minicom, realterm, etc...)
  *    It will receive a character and print the next character.
+ *
+ * note:
+ *    if you have a linux host, and the virtual port might appear
+ *    at /dev/ttyACM0, in this case modemmanager might kick in
+ *    and try to communicate with the device (thinking it as a modem)
+ *    you can remove modemmanager package to fix this issue
  */
 
 
@@ -175,11 +181,15 @@ static void cdcacm_data_rx_cb(usbd_device *usbd_dev, uint8_t ep)
 {
 	(void)ep;
 
+	// create a buffer to receive & send
 	char buf[64];
-	int len = usbd_ep_read_packet(usbd_dev, 0x01, buf, 64);
+	// get 1 byte
+	int len = usbd_ep_read_packet(usbd_dev, 0x01, buf, 1);
 
 	if (len) {
-		/* create a function to perform stuff... */
+		// create a function to do stuff
+		// increment the received character
+		// and send it back
 		for (int i=0; i<len; i++){
 			if (buf[i] == '\r'){
 			}
@@ -189,6 +199,8 @@ static void cdcacm_data_rx_cb(usbd_device *usbd_dev, uint8_t ep)
 				buf[i] -= 25;
 			}
 		}
+
+		// send the character back
 		while (usbd_ep_write_packet(usbd_dev, 0x82, buf, len) == 0);
 	}
 
