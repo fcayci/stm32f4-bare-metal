@@ -1,4 +1,4 @@
-/* linker script for STM32F4 Discovery board */
+/* linker script */
 
 MEMORY
 {
