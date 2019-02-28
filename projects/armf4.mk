@@ -85,27 +85,26 @@ $(TARGET).elf: $(OBJS)
 size: $(TARGET).elf
 	@$(SIZE) $(TARGET).elf
 
+disass: $(TARGET).elf
+	@$(OBJDUMP) -d $(TARGET).elf
+
+disass-all: $(TARGET).elf
+	@$(OBJDUMP) -D $(TARGET).elf
+
+debug:
+	@$(DBG) --eval-command="target extended-remote :4242" \
+	 $(TARGET).elf
+
 burn:
 	@st-flash write $(TARGET).bin 0x8000000
 
-debug:
-	@$(DBG) -tui --eval-command="target extended-remote :4242" \
-	--eval-command="layout asm" \
-	--eval-command="layout regs" \
-	 $(TARGET).elf
-
-disass: $(TARGET).elf
-	$(OBJDUMP) -xd $(TARGET).elf
-
 clean:
-	@echo "Cleaning" $(TARGET)
-	@rm -f $(OBJS)
+	@echo "Cleaning..."
 	@rm -f $(TARGET).elf
 	@rm -f $(TARGET).bin
 	@rm -f $(TARGET).map
 	@rm -f $(TARGET).hex
 	@rm -f $(TARGET).lst
-	@rm -f *.d
-	@rm -f *.o
+	@rm -f $(TARGET).o
 
-.PHONY: all build size clean burn debug disass
+.PHONY: all build size clean burn disass disass-all
