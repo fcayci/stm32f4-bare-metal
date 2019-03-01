@@ -18,7 +18,7 @@ with the included external tools/libraries such as CMSIS repo and any additional
 
 ## Compile
 
-[makefile](makefile) contains the necessary build scripts and compiler flags.
+[makefile](projects/armf4.mk) contains the necessary build scripts and compiler flags.
 
 Browse into any directory and run `make` to compile.
 
