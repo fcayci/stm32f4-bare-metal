@@ -106,5 +106,6 @@ clean:
 	@rm -f $(TARGET).hex
 	@rm -f $(TARGET).lst
 	@rm -f *.o
+	@rm -f *.d
 
 .PHONY: all build size clean burn disass disass-all
