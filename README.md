@@ -69,3 +69,4 @@ Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Stu
 * [extint](projects/extint/) - External interrupt example using the on-board push-button
 * [usb-vcp](projects/usb-vcp/) - USB Virtual COM Port implementation example. It depends on the [libopencm3](https://github.com/libopencm3/libopencm3) library for the USB stack
 * [dac](projects/dac/) - On-chip digital to analog converter operation
+* [uart](projects/uart/) - UART example to show how to send data over
