@@ -193,6 +193,7 @@ int main(void)
 	//   we need to program 22.8125
 	// Fraction : 16*0.8125 = 13 (multiply fraction with 16)
 	// Mantissa : 22
+	// 12-bit mantissa and 4-bit fraction
 	USART2->BRR |= (22 << 4);
 	USART2->BRR |= 13;
 
