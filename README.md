@@ -71,3 +71,5 @@ Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Stu
 * [dac](projects/dac/) - On-chip digital to analog converter operation
 * [uart](projects/uart/) - UART example to show how to send data over
 * [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl)
+* [wwdg](projects/wwdg/) - Window Watchdog example
+
