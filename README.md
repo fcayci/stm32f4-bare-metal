@@ -72,4 +72,4 @@ Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Stu
 * [uart](projects/uart/) - UART example to show how to send data over
 * [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl)
 * [wwdg](projects/wwdg/) - Window Watchdog example
-
+* [itm](projects/itm/) - Message sending through CoreSight ITM port 0. Install [OpenOCD](http://openocd.org/) to capture the message
