@@ -60,7 +60,7 @@ DBG = $(CROSS_COMPILE)gdb
 all: clean $(SRCS) build size
 	@echo "Successfully finished..."
 
-build: $(TARGET).elf $(TARGET).hex $(TARGET).bin $(TARGET).lst
+build: $(TARGET).elf $(TARGET).bin $(TARGET).lst
 
 $(TARGET).elf: $(OBJS)
 	@$(CC) $(OBJS) $(LDFLAGS) -o $@
