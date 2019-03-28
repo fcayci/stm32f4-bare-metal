@@ -115,14 +115,11 @@ int main(void)
 	// enable callback
 	init_systick(21000, 1);
 
-	// enable GPIOD clock
-	RCC->AHB1ENR |= (1 << 3);
-
-	GPIOD->MODER &= 0x00FFFFFF;   // Reset bits 31-24 to clear old values
-	GPIOD->MODER |= 0x55000000;   // Set MODER bits to 01 (0101 is 5 in hex)
-
-	// Set Pins 12-15 to 1 to turn on all LEDs
-	GPIOD->ODR |= 0xF000;
+	// setup LEDs
+	RCC->AHB1ENR |= (1 << 3); // enable GPIOD clock
+	GPIOD->MODER &= 0x00FFFFFF; // clear bits 31-24
+	GPIOD->MODER |= 0x55000000; // set bit groups to 01 (0101 is 5 in hex)
+	GPIOD->ODR |= 0xF000; // turn on all LEDs
 
 	while(1)
 	{
@@ -130,11 +127,11 @@ int main(void)
 		{
 			x = 4 * ( sin(2 * M_PI * (float)i / 1000) + 1);
 
-			if (x > 4)  	GPIOD->ODR = (0xF << 12);
+			if (x > 4)      GPIOD->ODR = (0xF << 12);
 			else if (x > 3) GPIOD->ODR = (0x7 << 12);
 			else if (x > 2) GPIOD->ODR = (0x3 << 12);
 			else if (x > 1) GPIOD->ODR = (0x1 << 12);
-			else 			GPIOD->ODR = (0x0 << 12);
+			else            GPIOD->ODR = (0x0 << 12);
 
 			delay_ms(1);
 		}
@@ -145,8 +142,7 @@ int main(void)
 
 /*
  * Millisecond delay function.
- *   volatile keyword is used so that compiler does not optimize it away
- * Polling method (If interrupt is not enabled)
+ *   volatile is used so that compiler does not optimize it away
  */
 void delay_ms(volatile uint32_t s)
 {
