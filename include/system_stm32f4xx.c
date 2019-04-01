@@ -117,7 +117,7 @@ void set_sysclk_to_168(void)
 	/* Enable the main PLL (CR: bit 24) */
 	RCC->CR |= (1 << 24);
 	/* Wait till the main PLL is ready (CR: bit 25) */
-	while((RCC->CR & (1 << 25)) == 0);
+	while(!(RCC->CR & (1 << 25)));
 	/* Configure Flash
 	 * prefetch enable (ACR:bit 8)
 	 * instruction cache enable (ACR:bit 9)
