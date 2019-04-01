@@ -58,9 +58,9 @@ void Reset_Handler(void)
 *************************************************/
 void reset_clock(void)
 {
-  	/* Reset the RCC clock configuration to the default reset state */
-  	/* Set HSION bit */
-  	RCC->CR = (1U << 0);
+	/* Reset the RCC clock configuration to the default reset state */
+	/* Set HSION bit */
+	RCC->CR |= (1U << 0);
 
 	/* Reset CFGR register */
 	RCC->CFGR = 0x00000000;
@@ -135,5 +135,5 @@ void set_sysclk_to_168(void)
 	RCC->CFGR &= (uint32_t)~(0x3 << 0);
 	RCC->CFGR |= (0x2 << 0);
 	/* Wait till the main PLL is used as system clock source (CFGR:bits 3:2) */
-	while ((RCC->CFGR & (uint32_t)(0x2 << 2) ) != (uint32_t)(0x2 << 2));
+	while (!(RCC->CFGR & (uint32_t)(0x2 << 2)));
 }

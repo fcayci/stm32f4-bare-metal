@@ -127,7 +127,7 @@ void set_sysclk_to_hse(void)
 	RCC->CFGR &= (uint32_t)~(0x3 << 0);
 	RCC->CFGR |= (0x1 << 0);
 	/* Wait till the main PLL is used as system clock source (CFGR:bits 3:2) */
-	while ((RCC->CFGR & (uint32_t)(0x1 << 2) ) != (uint32_t)(0x1 << 2));
+	while (!(RCC->CFGR & (uint32_t)(0x1 << 2)));
 }
 
 void set_sysclk_to_hsi(void)
@@ -205,7 +205,7 @@ void set_sysclk_to_84(void)
 	RCC->CFGR &= (uint32_t)~(0x3 << 0);
 	RCC->CFGR |= (0x2 << 0);
 	/* Wait till the main PLL is used as system clock source (CFGR:bits 3:2) */
-	while ((RCC->CFGR & (uint32_t)(0x2 << 2) ) != (uint32_t)(0x2 << 2));
+	while (!(RCC->CFGR & (uint32_t)(0x2 << 2)));
 }
 
 /*************************************************
