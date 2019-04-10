@@ -70,6 +70,7 @@ Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Stu
 * [usb-vcp](projects/usb-vcp/) - USB Virtual COM Port implementation example. It depends on the [libopencm3](https://github.com/libopencm3/libopencm3) library for the USB stack
 * [dac](projects/dac/) - On-chip digital to analog converter operation
 * [uart](projects/uart/) - UART example to show how to send data over
+* [uart_tx_int](projects/uart_tx_int/) - UART example with tx interrupt
 * [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl)
 * [wwdg](projects/wwdg/) - Window Watchdog example
 * [itm](projects/itm/) - Message sending through CoreSight ITM port 0. Install [OpenOCD](http://openocd.org/) to capture the message
