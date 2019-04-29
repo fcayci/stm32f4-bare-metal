@@ -230,7 +230,7 @@ int main(void)
 
 	NVIC_EnableIRQ(USART2_IRQn);
 
-	// now that everytihg is ready,
+	// now that everything is ready,
 	// enable tx interrupt and let it push out the buffer
 	tx_complete = 0;
 	bufpos = 0;
