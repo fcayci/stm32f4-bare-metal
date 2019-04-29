@@ -16,7 +16,7 @@
  *   5. enable transmit and receive (TE/RE bits)
  *   6. calculate baud rate and set BRR
  *   7. enable uart
- *.. 8. setup uart handler to send out a given buffer
+ *   8. setup uart handler to send out a given buffer
  *   9. enable tx interrupt from NVIC
  *   10.enable tx interrupt and disable when the buffer
  *      transmission is complete
@@ -162,7 +162,7 @@ void USART2_IRQHandler(void)
 	if (USART2->SR & (1 << 7)) {
 		// clear interrupt
 		USART2->SR &= (uint32_t)~(1 << 7);
-		
+
 		if (bufpos == sizeof(brand)) {
 			// buffer is flushed out, disable tx interrupt
 			tx_complete = 1;
