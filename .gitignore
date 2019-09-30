@@ -6,3 +6,6 @@
 *.lst
 *.map
 .vscode
+.metadata/
+Debug/
+*.launch

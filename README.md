@@ -1,16 +1,27 @@
 # stm32f4-bare-metal
 
-Bare metal STM32F4 examples to serve as starting points for projets. Educational purposes.
+Bare metal STM32F4 examples to serve as starting points for projects. Educational purposes.
 
 Some of the STM32F4xx family based processor headers are added in the `include` folder to get 
 register locations. CMSIS library is added for a general support. No extra HAL libraries is used except the selected projects described below.
 
-Common startup functions are moved to `include/system_stm32f4xx.c` to include in all projects.
+Common startup functions are moved to `include/startup_stm32f407vgtx.s` and `include/system_stm32f4xx.c` to include in all projects.
 
 ## Installation
 
-- Clone the project using `git clone --recurse-submodules https://github.com/fcayci/stm32f4-bare-metal`
+First, clone the project using `git clone --recurse-submodules https://github.com/fcayci/stm32f4-bare-metal`
 with the included external tools/libraries such as CMSIS repo and any additional libraries some of the projects use.
+
+There are two options. First is to use STM32CubeIDE, and second one is the setup your own dev environment. Both options are supported with relevant project settings and makefiles.
+
+### Option 1 - STM32CubeIDE
+
+- Download and install STM32CubeIDE. Select the workspace on the root folder, then import existing projects to workspace.
+- You do not need any additional tools. It comes with the compiler and debugger pre-installed.
+- Rest of the sections are for Option 2.
+
+### Option 2 - Custom development environment
+
 - You will need a **toolchain** (for compiler and binutils). Get one free from - [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
 - *For windows only*, you will need **make** tool. You can just get the make tool from [gnuwin32](http://gnuwin32.sourceforge.net/packages/make.htm). Alternatively you can install the minimalist GNU tools for windows from [mingw](https://mingw-w64.org/) and [MSYS](https://www.msys2.org/)
 - For the **programmer/debugger**, you can use - [stlink](https://github.com/texane/stlink) or [OpenOCD](http://openocd.org/). Though only stlink utility support is added.
@@ -66,13 +77,13 @@ Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Stu
 * [systick](projects/systick/) - Blinks LEDs using systick timer. Processor clock is set to max (168 Mhz)
 * [timer](projects/timer/) - Blinks LEDs one at a time using the Timer module and Timer interrupt
 * [pwm](projects/pwm/) - Fades an LED using pwm functionality using Timer module
-* [extint](projects/extint/) - External interrupt example using the on-board push-button
-* [usb-vcp](projects/usb-vcp/) - USB Virtual COM Port implementation example. It depends on the [libopencm3](https://github.com/libopencm3/libopencm3) library for the USB stack
+* [external](projects/external/) - External interrupt example using the on-board push-button
 * [dac](projects/dac/) - On-chip digital to analog converter operation
-* [dac_with_timer](projects/dac_with_timer/) - On-chip digital to analog converter operation with timer trigger
+* [dac-timer](projects/dac-timer/) - On-chip digital to analog converter operation with timer trigger
 * [uart](projects/uart/) - UART example to show how to send data over
-* [uart_tx_int](projects/uart_tx_int/) - UART example with tx interrupt
-* [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl)
+* [uart-tx-int](projects/uart-tx-int/) - UART example with tx interrupt
+* [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl version)
 * [wwdg](projects/wwdg/) - Window Watchdog example
 * [itm](projects/itm/) - Message sending through CoreSight ITM port 0. Install [OpenOCD](http://openocd.org/) to capture the message
 * [dma](projects/dma/) - Example DMA transfer using memory-to-memory mode
+* [usb-vcp-libopencm](projects/usb-vcp-libopencm/) - USB Virtual COM Port implementation example. It depends on the [libopencm3](https://github.com/libopencm3/libopencm3) library for the USB stack
