@@ -1,10 +1,12 @@
 CMSIS = ../../libs/CMSIS_5
 
 SRCS += ../../include/system_stm32f4xx.c
+SRCS += ../../include/startup_stm32f407vgtx.s
 
-#OBJS = $(SRCS:.c=.o)
-OBJS = $(addprefix ,$(notdir $(SRCS:.c=.o)))
+OBJS := $(addprefix ,$(notdir $(SRCS:.c=.o)))
+OBJS := $(addprefix ,$(notdir $(OBJS:.s=.o)))
 vpath %.c $(sort $(dir $(SRCS)))
+vpath %.s $(sort $(dir $(SRCS)))
 
 INCLUDES += -I.
 INCLUDES += -I../../include
@@ -14,6 +16,7 @@ CFLAGS += $(CDEFS)
 
 CFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
 CFLAGS += -O0 # optimization is off
+CFLAGS += -std=gnu11 # use GNU 11 standard
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2 # generate debug info
@@ -30,6 +33,7 @@ CFLAGS += -Wconversion # neg int const implicitly converted to uint
 CFLAGS += -fsingle-precision-constant
 CFLAGS += -fomit-frame-pointer # do not use fp if not needed
 CFLAGS += -ffunction-sections -fdata-sections
+CFLAGS += --specs=nano.specs
 
 # Chooses the relevant FPU option
 #CFLAGS += -mfloat-abi=soft # No FP
@@ -39,15 +43,14 @@ CFLAGS += -mfloat-abi=softfp -mfpu=fpv4-sp-d16 # Soft FP
 LDFLAGS += -mfloat-abi=softfp -mfpu=fpv4-sp-d16 # Soft FP
 #LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16 # Hard FP
 
-LDFLAGS += -march=armv7e-m # processor setup
-LDFLAGS += -nostartfiles # no start files are used
+LDFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
+#LDFLAGS += -nostartfiles # no start files are used
 LDFLAGS += --specs=nano.specs
-#LDFLAGS += --specs=nosys.specs
 LDFLAGS += -Wl,--gc-sections # linker garbage collector
 LDFLAGS += -Wl,-Map=$(TARGET).map #generate map file
 LDFLAGS += -T$(LINKER_SCRIPT)
 LDFLAGS += $(LIBS)
-LDFLAGS += -lc -lnosys
+LDFLAGS += -lc
 
 CROSS_COMPILE = arm-none-eabi-
 CC = $(CROSS_COMPILE)gcc

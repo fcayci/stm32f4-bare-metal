@@ -1,7 +1,7 @@
 TARGET = dma
 SRCS = dma.c
 
-LINKER_SCRIPT = ../../flash/stm32f407.ld
+LINKER_SCRIPT = ../../flash/STM32F407VGTX_FLASH.ld
 
 # Generate debug info
 DEBUG = 1

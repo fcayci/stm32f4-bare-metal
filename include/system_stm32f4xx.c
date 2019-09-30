@@ -9,11 +9,13 @@
 #include "system_stm32f4xx.h"
 
 /*************************************************
+* Update: Not used anymore. Left here for reference
 * Copy the data contents from LMA to VMA
 * Initializes data and bss sections
 *************************************************/
-void _init_data(void)
+void __init_data(void)
 {
+    /* get the variables from linker script */
     extern unsigned long __etext, __data_start__, __data_end__, __bss_start__, __bss_end__;
     unsigned long *src = &__etext;
     unsigned long *dst = &__data_start__;
@@ -29,13 +31,14 @@ void _init_data(void)
 
 
 /*************************************************
+* Update: Not used anymore. Left here for reference
 * entry point for the program
 * initializes data and bss sections and calls main program
 *************************************************/
-void Reset_Handler(void)
+void __Reset_Handler(void)
 {
     /* initialize data and bss sections */
-    _init_data();
+    __init_data();
 
     /* FPU settings, can be enabled from project makefile */
     #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
@@ -43,7 +46,7 @@ void Reset_Handler(void)
     #endif
 
     /* reset clock */
-    reset_clock();
+    SystemInit();
 
     /* call main function */
     main();
@@ -56,7 +59,7 @@ void Reset_Handler(void)
 /*************************************************
 * reset clock to HSI
 *************************************************/
-void reset_clock(void)
+void SystemInit(void)
 {
     /* Reset the RCC clock configuration to the default reset state */
     /* Set HSION bit */
@@ -85,7 +88,7 @@ void reset_clock(void)
 *************************************************/
 void set_sysclk_to_168(void)
 {
-    reset_clock();
+    SystemInit();
 
     /* Enable HSE (CR: bit 16) */
     RCC->CR |= ((uint32_t) (1 << 16));
@@ -105,7 +108,7 @@ void set_sysclk_to_168(void)
     RCC->CFGR |= (0 << 4);
     /* set ABP low speed prescaler to /4 (APB1) (CFGR:bits 12:10) */
     RCC->CFGR |= (0x5 << 10);
-    /* set ABP high speed prescaper to /2 (ABP2) (CFGR:bits 15:13) */
+    /* set ABP high speed prescaler to /2 (ABP2) (CFGR:bits 15:13) */
     RCC->CFGR |= (0x4 << 13);
 
     /* Set M, N, P and Q PLL dividers

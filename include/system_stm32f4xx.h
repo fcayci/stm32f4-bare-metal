@@ -12,14 +12,14 @@
 // Main PLL = N * (source_clock / M) / P
 // HSE = 8 Mhz
 // fCLK =   N * (8Mhz / M) / P
-#define PLL_M	8
-#define PLL_Q 	7
-#define PLL_P 	2
+#define PLL_M   8
+#define PLL_Q   7
+#define PLL_P   2
 #endif
 
 /* stm32f407 runs at 168Mhz max */
 #if defined (STM32F407xx)
-#define PLL_N 	336
+#define PLL_N   336
 #endif
 
 /* stm32f429 runs at 180Mhz max */
@@ -27,9 +27,9 @@
 #define PLL_N   360
 #endif
 
-void _init_data(void);
-void Reset_Handler(void);
-void reset_clock(void);
+void __init_data(void);
+void __Reset_Handler(void);
+void SystemInit(void);
 void set_sysclk_to_168(void);
 /* bring main */
 extern int main(void);
