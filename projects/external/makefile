@@ -1,7 +1,7 @@
-TARGET = extint
-SRCS = extint.c
+TARGET = external
+SRCS = external.c
 
-LINKER_SCRIPT = ../../flash/stm32f407.ld
+LINKER_SCRIPT = ../../flash/STM32F407VGTX_FLASH.ld
 
 # Generate debug info
 DEBUG = 0
@@ -12,6 +12,6 @@ CDEFS  = -DSTM32F407xx
 #CDEFS += -D__VFP_FP__
 
 # link math library
-#LIBS = -lm
+LIBS = -lm
 
 include ../armf4.mk

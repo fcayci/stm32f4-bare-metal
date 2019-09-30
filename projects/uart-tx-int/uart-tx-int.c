@@ -3,7 +3,7 @@
  *
  * author: Furkan Cayci
  * description:
- *   UART example without any interrupts
+ *   UART example with tx interrupt
  *   uses USART2 PA2/PA3 pins to transmit data
  *   connect a Serial to USB adapter to see the
  *   data on PC
@@ -16,6 +16,10 @@
  *   5. enable transmit and receive (TE/RE bits)
  *   6. calculate baud rate and set BRR
  *   7. enable uart
+ *   8. setup uart handler to send out a given buffer
+ *   9. enable tx interrupt from NVIC
+ *   10.enable tx interrupt and disable when the buffer
+ *      transmission is complete
  */
 
 #include "stm32f4xx.h"
@@ -26,6 +30,29 @@
 *************************************************/
 int main(void);
 
+const uint8_t brand[] = "furkan.space\n\r";
+volatile int tx_complete = 0;
+volatile int bufpos = 0;
+
+void USART2_IRQHandler(void)
+{
+    // check if the source is transmit interrupt
+    if (USART2->SR & (1 << 7)) {
+        // clear interrupt
+        USART2->SR &= (uint32_t)~(1 << 7);
+
+        if (bufpos == sizeof(brand)) {
+            // buffer is flushed out, disable tx interrupt
+            tx_complete = 1;
+            USART2->CR1 &= (uint32_t)~(1 << 7);
+        }
+        else {
+            // flush ot the next char in the buffer
+            tx_complete = 0;
+            USART2->DR = brand[bufpos++];
+        }
+    }
+}
 /*************************************************
 * main code starts from here
 *************************************************/
@@ -79,17 +106,22 @@ int main(void)
     // enable usart2 - UE, bit 13
     USART2->CR1 |= (1 << 13);
 
-    const uint8_t brand[] = "furkan.space\n\r";
+    NVIC_EnableIRQ(USART2_IRQn);
+
+    // now that everything is ready,
+    // enable tx interrupt and let it push out the buffer
+    tx_complete = 0;
+    bufpos = 0;
+    // enable usart2 tx interrupt
+    USART2->CR1 |= (1 << 7);
 
     while(1)
     {
-        for (uint32_t i=0; i<sizeof(brand); i++){
-            // send character
-            USART2->DR = brand[i];
-            // wait for transmit complete
-            while(!(USART2->SR & (1 << 6)));
-            // slow down
-            for(int i=0; i<1000000; i++);
+        // restart transmission
+        if (tx_complete) {
+            bufpos = 0;
+            // enable usart2 tx interrupt
+            USART2->CR1 |= (1 << 7);
         }
     }
 

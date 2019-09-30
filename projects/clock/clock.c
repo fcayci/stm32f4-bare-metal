@@ -58,52 +58,12 @@ void set_sysclk_to_hse(void);
 void set_sysclk_to_hsi(void);
 void set_sysclk_to_84(void);
 
-void Default_Handler(void);
 int main(void);
 void delay(volatile uint32_t s);
 
-/*************************************************
-* Vector Table
-*************************************************/
-// get the stack pointer location from linker
-typedef void (* const intfunc)(void);
-extern unsigned long __stack;
-
-// attribute puts table in beginning of .vectors section
-//   which is the beginning of .text section in the linker script
-// Add other vectors -in order- here
-// Vector table can be found on page 372 in RM0090
-__attribute__ ((section(".vectors")))
-void (* const vector_table[])(void) = {
-    (intfunc)((unsigned long)&__stack), /* 0x000 Stack Pointer */
-    Reset_Handler,                      /* 0x004 Reset         */
-    Default_Handler,                    /* 0x008 NMI           */
-    Default_Handler,                    /* 0x00C HardFault     */
-    Default_Handler,                    /* 0x010 MemManage     */
-    Default_Handler,                    /* 0x014 BusFault      */
-    Default_Handler,                    /* 0x018 UsageFault    */
-    0,                                  /* 0x01C Reserved      */
-    0,                                  /* 0x020 Reserved      */
-    0,                                  /* 0x024 Reserved      */
-    0,                                  /* 0x028 Reserved      */
-    Default_Handler,                    /* 0x02C SVCall        */
-    Default_Handler,                    /* 0x030 Debug Monitor */
-    0,                                  /* 0x034 Reserved      */
-    Default_Handler,                    /* 0x038 PendSV        */
-    Default_Handler                     /* 0x03C SysTick       */
-};
-
-/*************************************************
-* default interrupt handler
-*************************************************/
-void Default_Handler(void)
-{
-    for (;;);  // Wait forever
-}
-
 void set_sysclk_to_hse(void)
 {
-    reset_clock();
+    SystemInit();
 
     /* Enable HSE (CR: bit 16) */
     RCC->CR |= ((uint32_t) (1 << 16));
@@ -133,7 +93,7 @@ void set_sysclk_to_hse(void)
 void set_sysclk_to_hsi(void)
 {
     /* Reset goes to HSI by default */
-    reset_clock();
+    SystemInit();
 
     /* Configure Flash
      * prefetch enable (ACR:bit 8)
@@ -151,7 +111,7 @@ void set_sysclk_to_hsi(void)
  */
 void set_sysclk_to_84(void)
 {
-    reset_clock();
+    SystemInit();
 
     #undef PLL_P
     uint32_t PLL_P = 4;

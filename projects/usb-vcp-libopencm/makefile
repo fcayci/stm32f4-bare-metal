@@ -1,10 +1,10 @@
 TARGET = usb-vcp
 SRCS = usb-vcp.c
 
-LINKER_SCRIPT = ../../flash/stm32f407.ld
+LINKER_SCRIPT = ../../flash/STM32F407VGTX_FLASH.ld
 
 # Generate debug info
-DEBUG = 0
+DEBUG = 1
 
 CDEFS  = -DSTM32F407xx
 
