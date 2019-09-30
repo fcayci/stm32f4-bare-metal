@@ -7,5 +7,6 @@
 *.map
 .vscode
 .metadata/
+.settings/
 Debug/
 *.launch
