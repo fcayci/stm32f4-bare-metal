@@ -9,27 +9,28 @@ Common startup functions are moved to `include/startup_stm32f407vgtx.s` and `inc
 
 ## Installation
 
-First, clone the project using `git clone --recurse-submodules https://github.com/fcayci/stm32f4-bare-metal`
-with the included external tools/libraries such as CMSIS repo and any additional libraries some of the projects use.
+First, clone the project using `git clone --recurse-submodules https://github.com/fcayci/stm32f4-bare-metal`. The repository includes other repositories such as `CMSIS` as submodules under `lib` folder. You can alternatively clone the repository, then initialize and update the submodules with `git submodule init` and `git submodule update` commands.
 
-There are two options. First is to use STM32CubeIDE, and second one is the setup your own dev environment. Both options are supported with relevant project settings and makefiles.
+## Development
+
+There are two options for development. First one is to use [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) from ST. Second one is the setup your own development environment. Both options are supported with relevant project settings or makefiles.
 
 ### Option 1 - STM32CubeIDE
 
-- Download and install STM32CubeIDE. Select the workspace on the root folder, then import existing projects to workspace.
+- Download and install [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html). Select workspace on the root folder, then import existing projects to workspace.
 - You do not need any additional tools. It comes with the compiler and debugger pre-installed.
 - Rest of the sections are for Option 2.
 
 ### Option 2 - Custom development environment
 
-- You will need a **toolchain** (for compiler and binutils). Get one free from - [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
-- *For windows only*, you will need **make** tool. You can just get the make tool from [gnuwin32](http://gnuwin32.sourceforge.net/packages/make.htm). Alternatively you can install the minimalist GNU tools for windows from [mingw](https://mingw-w64.org/) and [MSYS](https://www.msys2.org/)
+- Get **toolchain** (for compiler and binutils) from [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
+- *For windows only*, install **make** tool. You can just get the make tool from [gnuwin32](http://gnuwin32.sourceforge.net/packages/make.htm). Alternatively you can install the minimalist GNU tools for windows from [mingw](https://mingw-w64.org/) and [MSYS](https://www.msys2.org/)
 - For the **programmer/debugger**, you can use - [stlink](https://github.com/texane/stlink) or [OpenOCD](http://openocd.org/). Though only stlink utility support is added.
 - You can use your favorite code editor to view/edit the contents. Here is an open source one: [Visual Studio Code](https://code.visualstudio.com/).
 
-## Compile
+#### Compile
 
-[makefile](projects/armf4.mk) contains the necessary build scripts and compiler flags.
+[makefile](projects/armf4.mk) contains necessary build scripts and compiler flags for all projects. Individual settings can be changed from local makefiles from projects such as [blinky makefile](projects/blinky/makefile)
 
 Browse into any directory and run `make` to compile.
 
@@ -43,13 +44,13 @@ If everything is setup correctly, you should see the completed message.
 Cleaning blinky
 Building blinky.c
    text    data     bss     dec     hex filename
-    368	      0	      0	    368	    170	blinky.elf
+    852	      8	   1568	   2428	    97c	blinky.elf
 Successfully finished...
 ```
 
 If you see any errors about command not found, make sure the toolchain binaries are in your `PATH`. On Windows check the *Environment Variables* for your account. On Linux/macOS run `echo $PATH` to verify your installation.
 
-## Program
+#### Program
 
 Run `make burn` to program the chip.
 ```
@@ -59,15 +60,13 @@ Run `make burn` to program the chip.
 
 Install the [ST LINK](https://www.st.com/en/development-tools/st-link-v2.html) drivers if you cannot see your board when `make burn` is run.
 
-## Disassemble
+#### Disassemble
 
 Run `make disass` / `make disass-all` to disassamble.
 
-## Debug
+#### Debug
 
 In order to debug your code, connect your board to the PC, run `st-util` (comes with stlink utility) from one terminal, and from another terminal within the project directory run `make debug`. You can then use general **gdb** commands to browse through the code.
-
-Alternatively, you can install *Cortex-Debug* plug-in from marus25 on Visual Studio Code, and debug using the VSCode interface. No need for additional terminals. An example launch script is given with the code.
 
 ## Projects
 
