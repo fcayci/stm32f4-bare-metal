@@ -9,4 +9,5 @@
 .metadata/
 .settings/
 Debug/
+Release/
 *.launch
