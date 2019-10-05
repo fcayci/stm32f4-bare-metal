@@ -51,9 +51,9 @@ void spi_write(uint8_t reg, uint8_t data)
 {
     GPIOE->ODR &= (uint16_t)(~(1 << 3)); // enable
     // bit 15 is 0 for write for lis302dl
-    uint16_t frame = 0;
-    frame |= (uint16_t)(reg << 8);
+    uint32_t frame = 0;
     frame |= data;
+    frame |= (uint16_t)(reg << 8);
     // Send data
     SPI1->DR = frame;
     // wait until transmit is done (TXE flag)
