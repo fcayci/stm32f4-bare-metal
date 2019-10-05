@@ -54,7 +54,7 @@ static volatile uint32_t tDelay;
 /*************************************************
 * default systick interrupt handler
 *************************************************/
-void Systick_Handler(void)
+void SysTick_Handler(void)
 {
     if (tDelay != 0x00)
     {
