@@ -40,11 +40,6 @@ void __Reset_Handler(void)
     /* initialize data and bss sections */
     __init_data();
 
-    /* FPU settings, can be enabled from project makefile */
-    #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
-    SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
-    #endif
-
     /* reset clock */
     SystemInit();
 
@@ -61,6 +56,11 @@ void __Reset_Handler(void)
 *************************************************/
 void SystemInit(void)
 {
+	/* FPU settings, can be enabled from project makefile */
+	#if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
+	SCB->CPACR |= ((3UL << 10*2)|(3UL << 11*2));  /* set CP10 and CP11 Full Access */
+	#endif
+
     /* Reset the RCC clock configuration to the default reset state */
     /* Set HSION bit */
     RCC->CR |= (1U << 0);
@@ -88,7 +88,6 @@ void SystemInit(void)
 *************************************************/
 void set_sysclk_to_168(void)
 {
-    SystemInit();
 
     /* Enable HSE (CR: bit 16) */
     RCC->CR |= ((uint32_t) (1 << 16));
