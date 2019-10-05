@@ -1,5 +1,5 @@
 /*
- * uart.c
+ * uart-tx-int.c
  *
  * author: Furkan Cayci
  * description:

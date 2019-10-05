@@ -5,7 +5,7 @@
  * description:
  *   connects the push button located at PA0 to external interrupt 0
  *   lights up the next LED in each press.
- *   Does not elimine debouncing, so will move more then 1 LED most
+ *   Does not worry about debouncing, so will move more then 1 LED most
  *   of the time.
  *
  * external interrupt setup steps:

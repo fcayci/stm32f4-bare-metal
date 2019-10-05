@@ -1,5 +1,5 @@
 /*
- * dac.c
+ * dac-timer.c
  *
  * author: Furkan Cayci
  * description:
@@ -40,8 +40,6 @@ void TIM2_IRQHandler(void)
     // update the new value, let timer trgo handle dac
     dac_value += 0x10;
     DAC->DHR12R1 = dac_value;
-    // for manual software trigger (not needed)
-    //DAC->SWTRIGR |= (1 << 0 ); // trigger ch1
 }
 
 /*************************************************
@@ -103,11 +101,7 @@ int main(void)
 
     while(1)
     {
-        // for manual software triggering (not needed)
-        // dac_value += 0x10;
-        // DAC->DHR12R1 = dac_value;
-        // DAC->SWTRIGR |= (1 << 0 ); // trigger ch1
-        // for (i=0; i<1000; i++);
+    	// Do nothing. Let timer irq do its magic
     }
 
     return 0;
