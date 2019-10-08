@@ -7,6 +7,9 @@
  *    frequencies and different sources and change it on the fly.
  *    some of the optimizations might be missing. Use with caution.
  *
+ *    Also note that with different optimization options, blinking speeds will
+ *      vary since a dummy counter is in use.
+ *
  *    Three different clock sources can derive the system clock (SYSCLK):
  *      HSI -> 16 Mhz internal oscillator clock
  *      HSE ->  8 Mhz external oscillator clock
@@ -176,7 +179,7 @@ int main(void)
     /* set system clock to 168 Mhz */
     set_sysclk_to_168();
 
-    uint32_t i = 0;
+    volatile uint32_t i = 0;
 
     // enable GPIOD clock
     RCC->AHB1ENR |= (1 << 3);
