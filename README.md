@@ -2,10 +2,9 @@
 
 Bare metal STM32F4 examples to serve as starting points for projects. Educational purposes.
 
-Some of the STM32F4xx family based processor headers are added in the `include` folder to get 
-register locations. CMSIS library is added for a general support. No extra HAL libraries is used except the selected projects described below.
+Some of the STM32F4xx family based processor headers are added in the `include` folder to get register locations. CMSIS library is added for a general support. No extra HAL libraries is used except the selected projects described below.
 
-Common startup functions are moved to `include/startup_stm32f407vgtx.s` and `include/system_stm32f4xx.c` to include in all projects.
+Common startup functions are located in the `include/startup_stm32f407vgtx.s` and `include/system_stm32f4xx.c` files to be included in all projects.
 
 ## Installation
 
@@ -17,7 +16,7 @@ There are two options for development. First one is to use [STM32CubeIDE](https:
 
 ### Option 1 - STM32CubeIDE
 
-- Download and install [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html). Select workspace on the root folder, then import existing projects to workspace.
+- Download and install [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html). Select workspace on the root folder, then import existing projects to workspace. (File -> Import -> General -> Existing Projects into Workspace)
 - You do not need any additional tools. It comes with the compiler and debugger pre-installed.
 - Rest of the sections are for Option 2.
 
