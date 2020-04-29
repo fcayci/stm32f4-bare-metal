@@ -19,7 +19,7 @@
  *     PE1 - INT2
  *
  * setup:
- *    These stesp are for SPI master mode
+ *    These steps are for SPI master mode
  *    0. configure pins alternate mode and choose the
  *       correct AF number (5 for SPI1)
  *    1. set BR[2:0] for serial clock baud rate (SPI_CR1)
@@ -82,8 +82,9 @@ uint8_t spi_read(uint8_t reg)
     // wait until rx buf is not empty (RXNE flag)
     while (!(SPI1->SR & (1 << 0)));
 
+    uint8_t b = (uint8_t)SPI1->DR;
     GPIOE->ODR |= (1 << 3); // disable
-    return (uint8_t)SPI1->DR;
+    return b;
 }
 
 /*************************************************
