@@ -3,8 +3,10 @@ CMSIS = ../../libs/CMSIS_5
 SRCS += ../../include/system_stm32f4xx.c
 SRCS += ../../include/startup_stm32f407vgtx.s
 
-OBJS := $(addprefix ,$(notdir $(SRCS:.c=.o)))
-OBJS := $(addprefix ,$(notdir $(OBJS:.s=.o)))
+OBJDIR = Debug
+
+OBJS := $(addprefix $(OBJDIR)/,$(notdir $(SRCS:.c=.o)))
+OBJS := $(addprefix $(OBJDIR)/,$(notdir $(OBJS:.s=.o)))
 vpath %.c $(sort $(dir $(SRCS)))
 vpath %.s $(sort $(dir $(SRCS)))
 
@@ -47,7 +49,7 @@ LDFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
 #LDFLAGS += -nostartfiles # no start files are used
 LDFLAGS += --specs=nano.specs
 LDFLAGS += -Wl,--gc-sections # linker garbage collector
-LDFLAGS += -Wl,-Map=$(TARGET).map #generate map file
+LDFLAGS += -Wl,-Map=$(OBJDIR)/$(TARGET).map #generate map file
 LDFLAGS += -T$(LINKER_SCRIPT)
 LDFLAGS += $(LIBS)
 LDFLAGS += -lc
@@ -66,49 +68,44 @@ all: clean $(SRCS) build size
 build: $(TARGET).elf $(TARGET).bin $(TARGET).lst
 
 $(TARGET).elf: $(OBJS)
-	@$(CC) $(OBJS) $(LDFLAGS) -o $@
+	$(CC) $(OBJS) $(LDFLAGS) -o $(OBJDIR)/$@
 
-%.o: %.c
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(OBJDIR)
 	@echo "Building" $<
-	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-%.o: %.s
+$(OBJDIR)/%.o: %.s
 	@echo "Building" $<
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.hex: %.elf
-	@$(OBJCOPY) -O ihex $< $@
+	@$(OBJCOPY) -O ihex $(OBJDIR)/$< $(OBJDIR)/$@
 
 %.bin: %.elf
-	@$(OBJCOPY) -O binary $< $@
+	@$(OBJCOPY) -O binary $(OBJDIR)/$< $(OBJDIR)/$@
 
 %.lst: %.elf
-	@$(OBJDUMP) -x -S $(TARGET).elf > $@
+	@$(OBJDUMP) -x -S $(OBJDIR)/$(TARGET).elf > $(OBJDIR)/$@
 
 size: $(TARGET).elf
-	@$(SIZE) $(TARGET).elf
+	@$(SIZE) $(OBJDIR)/$(TARGET).elf
 
 disass: $(TARGET).elf
-	@$(OBJDUMP) -d $(TARGET).elf
+	@$(OBJDUMP) -d $(OBJDIR)/$(TARGET).elf
 
 disass-all: $(TARGET).elf
-	@$(OBJDUMP) -D $(TARGET).elf
+	@$(OBJDUMP) -D $(OBJDIR)/$(TARGET).elf
 
 debug:
 	@$(DBG) --eval-command="target extended-remote :4242" \
-	 $(TARGET).elf
+	 $(OBJDIR)/$(TARGET).elf
 
 burn:
-	@st-flash write $(TARGET).bin 0x8000000
+	@st-flash write $(OBJDIR)/$(TARGET).bin 0x8000000
 
 clean:
 	@echo "Cleaning..."
-	@rm -f $(TARGET).elf
-	@rm -f $(TARGET).bin
-	@rm -f $(TARGET).map
-	@rm -f $(TARGET).hex
-	@rm -f $(TARGET).lst
-	@rm -f *.o
-	@rm -f *.d
+	@rm -rf $(OBJDIR)/
 
-.PHONY: all build size clean burn disass disass-all
+.PHONY: all build size clean burn debug disass disass-all
