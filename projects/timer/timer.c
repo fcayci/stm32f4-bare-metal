@@ -35,18 +35,20 @@ void TIM2_IRQHandler(void)
 {
     static uint8_t i = 1;
 
-    // Clear pending bit first
-    // This is important because of the delay,
-    // interrupt handler gets fired off twice!
-    // if this is cleared at the end
-    TIM2->SR = (uint16_t)(~(1 << 0));
+	// clear interrupt status
+	if (TIM2->DIER & 0x01) {
+		if (TIM2->SR & 0x01) {
+			TIM2->SR &= ~(1U << 0);
+		}
+	}
 
-    GPIOD->ODR = (uint16_t)(i << 12);
+    GPIOD->ODR = (i << 12);
 
     if (i == 0x08) {
-        i = 1;
-    } else {
-        i = (uint8_t)(i << 1);
+    	i = 1;
+    }
+    else {
+    	i = (i << 1);
     }
 }
 
@@ -92,7 +94,7 @@ int main(void)
 
     while(1)
     {
-        // Do nothing. let timer handler do its magic
+        // Do nothing.
     }
 
     return 0;
