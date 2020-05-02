@@ -28,7 +28,9 @@ endif
 
 CFLAGS += -fno-common
 CFLAGS += -Wall # turn on warnings
-CFLAGS += -pedantic # more warnings
+CFLAGS += -Wextra # extra warnings
+CFLAGS += -pedantic # strict ISO warnings
+CFLAGS += -Wmissing-include-dirs
 CFLAGS += -Wsign-compare
 CFLAGS += -Wcast-align
 CFLAGS += -Wconversion # neg int const implicitly converted to uint
@@ -46,10 +48,15 @@ LDFLAGS += -mfloat-abi=softfp -mfpu=fpv4-sp-d16 # Soft FP
 #LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16 # Hard FP
 
 LDFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
-#LDFLAGS += -nostartfiles # no start files are used
+#LDFLAGS += -nostartfiles # dont use standard start files
+#LDFLAGS += -nodefaultlibs # dont use standard libraries
+#LDFLAGS += -nostdlib # dont use startup or default libs
+LDFLAGS += --specs=nosys.specs
 LDFLAGS += --specs=nano.specs
+#LDFLAGS += --specs=rdimon.specs
 LDFLAGS += -Wl,--gc-sections # linker garbage collector
 LDFLAGS += -Wl,-Map=$(OBJDIR)/$(TARGET).map #generate map file
+LDFLAGS += -Wl,--cref # add symbols to map file
 LDFLAGS += -T$(LINKER_SCRIPT)
 LDFLAGS += $(LIBS)
 LDFLAGS += -lc
