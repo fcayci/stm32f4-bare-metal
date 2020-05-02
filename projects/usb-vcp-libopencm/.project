@@ -44,11 +44,6 @@
 			<locationURI>WORKSPACE_LOC/include/system_stm32f4xx.c</locationURI>
 		</link>
 		<link>
-			<name>system_stm32f4xx.h</name>
-			<type>1</type>
-			<locationURI>WORKSPACE_LOC/include/system_stm32f4xx.h</locationURI>
-		</link>
-		<link>
 			<name>lib/usb</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
