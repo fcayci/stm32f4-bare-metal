@@ -97,7 +97,7 @@ int main(void)
         GPIOD->ODR ^= (1 << 12);  // Toggle LED
     }
 
-    __asm__("NOP"); // Assembly inline can be used if needed
+    __asm("NOP"); // Assembly inline can be used if needed
     return 0;
 }
 
