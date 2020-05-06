@@ -85,3 +85,4 @@ In order to debug your code, connect your board to the PC, run `st-util` (comes 
 * [itm](projects/itm/) - Message sending through CoreSight ITM port 0
 * [dma](projects/dma/) - Example DMA transfer using memory-to-memory mode
 * [sleepy](projects/sleepy/) - Low Power mode operations (sleep and stop)
+* [flash](projects/flash/) - Example to show how to write/erase internal flash memory
