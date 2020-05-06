@@ -1,6 +1,3 @@
 [submodule "libs/CMSIS_5"]
 	path = libs/CMSIS_5
 	url = https://github.com/ARM-software/CMSIS_5
-[submodule "libs/libopencm3"]
-	path = libs/libopencm3
-	url = https://github.com/libopencm3/libopencm3.git

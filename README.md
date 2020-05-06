@@ -72,7 +72,7 @@ In order to debug your code, connect your board to the PC, run `st-util` (comes 
 * [blinky](projects/blinky/) - Good old blink LEDs example
 * [clock](projects/clock/) - Shows how to change clock frequencies on the fly
 * [math](projects/math/) - A simple sine function to test math library operation
-* [systick](projects/systick/) - Blinks LEDs using systick timer. Processor clock is set to max (168 Mhz)
+* [systick](projects/systick/) - Blinks LEDs using systick timer.
 * [timer](projects/timer/) - Blinks LEDs one at a time using the Timer module and Timer interrupt
 * [pwm](projects/pwm/) - Fades an LED using pwm functionality using Timer module
 * [external](projects/external/) - External interrupt example using the on-board push-button
@@ -82,6 +82,5 @@ In order to debug your code, connect your board to the PC, run `st-util` (comes 
 * [uart-tx-int](projects/uart-tx-int/) - UART example with tx interrupt
 * [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl version)
 * [wwdg](projects/wwdg/) - Window Watchdog example
-* [itm](projects/itm/) - Message sending through CoreSight ITM port 0. Install [OpenOCD](http://openocd.org/) to capture the message
+* [itm](projects/itm/) - Message sending through CoreSight ITM port 0
 * [dma](projects/dma/) - Example DMA transfer using memory-to-memory mode
-* [usb-vcp-libopencm](projects/usb-vcp-libopencm/) - USB Virtual COM Port implementation example. It depends on the [libopencm3](https://github.com/libopencm3/libopencm3) library for the USB stack
