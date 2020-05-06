@@ -29,19 +29,19 @@ int main(void);
 *************************************************/
 void TIM4_IRQHandler(void)
 {
-	static uint32_t t = 0;
-	static uint16_t duty = 0;
+    static uint32_t t = 0;
+    static uint16_t duty = 0;
 
-	// clear interrupt status
-	if (TIM4->DIER & 0x01) {
-		if (TIM4->SR & 0x01) {
-			TIM4->SR &= ~(1U << 0);
-		}
-	}
+    // clear interrupt status
+    if (TIM4->DIER & 0x01) {
+        if (TIM4->SR & 0x01) {
+            TIM4->SR &= ~(1U << 0);
+        }
+    }
 
-	duty =(uint16_t)(PWMPERIOD/2.0 * (sin(2*M_PI*(double)t/(SAMPLE)) + 1.0));
-	++t;
-	if (t == SAMPLE) t = 0;
+    duty =(uint16_t)(PWMPERIOD/2.0 * (sin(2*M_PI*(double)t/(SAMPLE)) + 1.0));
+    ++t;
+    if (t == SAMPLE) t = 0;
     // set new duty cycle
     TIM4->CCR1 = duty;
 }
