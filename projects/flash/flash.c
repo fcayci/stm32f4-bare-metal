@@ -16,12 +16,19 @@
 *************************************************/
 int main(void);
 
+// flash unlock sequence
 #define KEY1 0x45670123
 #define KEY2 0xCDEF89AB
 
+// variable that will be hold in the flash
+#define VARADDR 0x0800C000 // address that will hold the variable
+#define VAR     0x12345670 // variable value
+
 void unlock_flash() {
-    FLASH->KEYR = KEY1;
-    FLASH->KEYR = KEY2;
+    if (FLASH->CR & FLASH_CR_LOCK) {
+        FLASH->KEYR = KEY1;
+        FLASH->KEYR = KEY2;
+    }
 }
 
 void lock_flash() {
@@ -36,11 +43,10 @@ void erase_flash_sector3() {
     FLASH->CR |= (sec << 3); // SNB bit 3:6
     FLASH->CR |= FLASH_CR_STRT; // start
     while(FLASH->SR & FLASH_SR_BSY); // check if busy
+    FLASH->CR &= ~FLASH_CR_SER; // clear SER bit
+    FLASH->CR &= ~(0xFU << 3); // clear SNB bit 3:6
     __enable_irq();
 }
-
-#define KEYADDR 0x0800C000 // address that will hold the key
-#define KEY     0xF2345670 // key value
 
 void write_flash(uint32_t addr, uint32_t data){
     while(FLASH->SR & FLASH_SR_BSY); // check if busy
@@ -49,6 +55,8 @@ void write_flash(uint32_t addr, uint32_t data){
     FLASH->CR |= (0x2 << 8);   // program PSIZE
     *(volatile uint32_t*)addr = data;
     while(FLASH->SR & FLASH_SR_BSY); // check if busy
+    FLASH->CR &= (~FLASH_CR_PG); // disable PG bit
+    FLASH->CR &= ~(0x3U << 8); // clear PSIZE bit 8:9
 }
 
 /*************************************************
@@ -73,7 +81,7 @@ int main(void)
         unlock_flash();
 
         erase_flash_sector3();
-        write_flash(KEYADDR, KEY);
+        write_flash(VARADDR, VAR);
         // do read write
         lock_flash();
     }
