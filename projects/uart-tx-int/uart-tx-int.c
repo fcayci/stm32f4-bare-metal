@@ -108,7 +108,7 @@ int main(void)
 
     while(1)
     {
-    	for(volatile int i=0; i<10000000; i++); // a long wait. should be more than enough the push out the buffer
+        for(volatile int i=0; i<10000000; i++); // a long wait. should be more than enough the push out the buffer
         // restart transmission by enabling usart2 tx interrupt
         USART2->CR1 |= (1 << 7);
     }

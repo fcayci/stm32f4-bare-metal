@@ -80,6 +80,7 @@ In order to debug your code, connect your board to the PC, run `st-util` (comes 
 * [dac-timer](projects/dac-timer/) - On-chip digital to analog converter operation with timer trigger
 * [uart](projects/uart/) - UART example to show how to send data over
 * [uart-tx-int](projects/uart-tx-int/) - UART example with tx interrupt
+* [uart-dma](projects/uart-dma/) - UART tx example with DMA transfer
 * [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl version)
 * [wwdg](projects/wwdg/) - Window Watchdog example
 * [itm](projects/itm/) - Message sending through CoreSight ITM port 0
