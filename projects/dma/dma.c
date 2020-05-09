@@ -30,18 +30,22 @@
 *************************************************/
 int main(void);
 
+#define BUF_SIZE 256
+
 // Create a pointer at source and destination addresses
-uint8_t *src_addr = (uint8_t *) 0x2000A000;
-uint8_t *dst_addr = (uint8_t *) 0x2000A400;
+volatile uint8_t *src_addr = (uint8_t *) 0x2000A000;
+volatile uint8_t *dst_addr = (uint8_t *) 0x2000A400;
 
 void DMA2_Stream0_IRQHandler(void)
 {
-    // clear stream 0 transfer complete interrupt
-    DMA2->LIFCR |= (1 << 5);
-    // Check out the destination contents after DMA transfer
-    for (uint32_t i=0; i<64; i++){
-        GPIOD->ODR = (uint16_t)(dst_addr[i] << 12);
-        for(uint32_t j=1000000; j>0; j--);
+    if (DMA2->LISR & (1 << 5)) {
+        // clear stream 0 transfer complete interrupt
+        DMA2->LIFCR |= (1 << 5);
+        // Check out the destination contents after DMA transfer
+        for (int i=0; i<BUF_SIZE/4; i++){
+            GPIOD->ODR = (uint16_t)(dst_addr[i] << 12);
+            for(volatile int j=1000000; j>0; j--);
+        }
     }
 }
 
@@ -53,22 +57,20 @@ int main(void)
     /* set system clock to 168 Mhz */
     set_sysclk_to_168();
 
-    volatile uint32_t i;
-
     /* Enable GPIOD clock (AHB1ENR: bit 3) */
     RCC->AHB1ENR |= (1 << 3);
 
     // make leds output
-    GPIOD->MODER &= 0xCCFFFFFF;
-    GPIOD->MODER |= 0x55000000;
+    GPIOD->MODER &= ~(0xFFU << 24);
+    GPIOD->MODER |=  (0x55U << 24);
     // light them up before the storm
     GPIOD->ODR = (0xF << 12);
     // wait a bit
-    for(i=10000000; i>0; i--);
+    for(volatile int i=10000000; i>0; i--);
 
     // Fill src_addr with numbers
     // Zero out dst_addr
-    for (i=0; i<256; i++){
+    for (int i=0; i<BUF_SIZE; i++){
         src_addr[i] = (uint8_t)i;
         dst_addr[i] = 0;
     }
@@ -78,8 +80,7 @@ int main(void)
     // enable DMA2 clock, bit 22 on AHB1ENR
     RCC->AHB1ENR |= (1 << 22);
 
-    // disable any ongoing dma bit0
-    //DMA2_Stream0->CR &= (uint32_t)~(1 << 0);
+    // clear DMA Stream
     DMA2_Stream0->CR = 0;
     // wait until dma is disabled
     while(DMA2_Stream0->CR & (1 << 0));
@@ -105,7 +106,7 @@ int main(void)
     // destination memory address
     DMA2_Stream0->M0AR = (uint32_t)dst_addr;
     // number of items to be transferred
-    DMA2_Stream0->NDTR = 256;
+    DMA2_Stream0->NDTR = BUF_SIZE;
 
     // set channel priority PL bits17:16 to medium
     DMA2_Stream0->CR |= (0x1 << 16);
