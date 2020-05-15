@@ -7,9 +7,6 @@
  *    the LEDs are connected to GPIOD 12-15
  *    which has timer4 capability.
  *    GPIOD 12 is connected to timer4 channel1
- *
- * setup:
- *    uses 1 on-board LED
  */
 
 #include "stm32f4xx.h"
@@ -80,7 +77,7 @@ int main(void)
     // enable update interrupt
     TIM4->DIER |= (1 << 0);
 
-    NVIC->IP[TIM4_IRQn] = 0x20; // Priority level 2
+    NVIC_SetPriority(TIM4_IRQn, 2); // Priority level 2
     // enable TIM4 IRQ from NVIC
     NVIC_EnableIRQ(TIM4_IRQn);
 

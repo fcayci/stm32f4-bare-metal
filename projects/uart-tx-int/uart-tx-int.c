@@ -100,6 +100,7 @@ int main(void)
     // enable usart2 - UE, bit 13
     USART2->CR1 |= (1 << 13);
 
+    NVIC_SetPriority(USART2_IRQn, 1); // Priority level 1
     NVIC_EnableIRQ(USART2_IRQn);
 
     // now that everything is ready,

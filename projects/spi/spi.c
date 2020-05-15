@@ -49,10 +49,10 @@ uint8_t spi_read(uint8_t reg);
  */
 void spi_write(uint8_t reg, uint8_t data)
 {
-    GPIOE->ODR &= (uint16_t)(~(1 << 3)); // enable
+    GPIOE->ODR &= ~(1U << 3); // enable
     // bit 15 is 0 for write for lis302dl
     uint32_t frame = 0;
-    frame |= data;
+    frame = data;
     frame |= (uint16_t)(reg << 8);
     // Send data
     SPI1->DR = frame;
@@ -70,11 +70,11 @@ void spi_write(uint8_t reg, uint8_t data)
  */
 uint8_t spi_read(uint8_t reg)
 {
-    GPIOE->ODR &= (uint16_t)(~(1 << 3)); // enable
+    GPIOE->ODR &= ~(1U << 3); // enable
     // bit 15 is 1 for read for lis302dl
     uint16_t frame = 0;
-    frame |= (1 << 15);
     frame |= (uint16_t)(reg << 8);
+    frame |= (1 << 15); // read bit
     // Send data
     SPI1->DR = frame;
     // wait until tx buf is empty (TXE flag)

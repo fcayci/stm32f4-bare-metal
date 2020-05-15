@@ -5,7 +5,9 @@
  * description:
  *   erase sector 3 and write 4-bytes of data to flash
  *   careful with flash - have a button guard so that
- *   it does not execute everytime the system boots up
+ *   it does not execute every time the system boots up
+ *
+ *   It assumes the board runs with default USB power
  */
 
 #include "stm32f4xx.h"
@@ -56,7 +58,6 @@ void write_flash(uint32_t addr, uint32_t data){
     *(volatile uint32_t*)addr = data;
     while(FLASH->SR & FLASH_SR_BSY); // check if busy
     FLASH->CR &= (~FLASH_CR_PG); // disable PG bit
-    FLASH->CR &= ~(0x3U << 8); // clear PSIZE bit 8:9
 }
 
 /*************************************************
@@ -73,9 +74,11 @@ int main(void)
     GPIOA->MODER &= 0xFFFFFFFC;   // Reset bits 0-1 to clear old values
     GPIOA->MODER |= 0x00000000;   // Make button an input
 
+    // wait a little bit to give time for button press
     volatile int i = 0;
-    for(;i<100000;i++);
+    for(i=0; i<100000;i++);
 
+    // only update if button is pressed;
     if(GPIOA->IDR & 0x01) {
         // read / write op
         unlock_flash();

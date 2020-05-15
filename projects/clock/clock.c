@@ -24,13 +24,14 @@
  *      USB OTG FS clock -> 48 Mhz (derived from PLL48CLK)
  *      RNG clock        -> 48 Mhz (derived from PLL48CLK)
  *      SDIO clock       -> 48 Mhz (derived from PLL48CLK)
- *      I2S clock -> Can be derived from a separate PLLI2C clock or I2C_CKIN pin
+ *      I2S clock        -> Can be derived from a separate PLLI2C
+ *                           clock or I2C_CKIN pin
  *
  *    Main PLL clock can be configured by the following formula:
- *      * choosing HSI or HSE as the source:
- *      * fVCO = source_clock * (N / M)
- *      * Main PLL = fVCO / P
- *      * PLL48CLK = fVCO / Q
+ *      choose HSI or HSE as the source:
+ *      fVCO = source_clock * (N / M)
+ *      Main PLL = fVCO / P
+ *      PLL48CLK = fVCO / Q
  *
  *    source_clock: can be HSI or HSE
  *      bit 22 on RCC_PLLCFGR register. 1:HSE, 0:HSI
@@ -46,9 +47,6 @@
  *
  *    M: can be 2 <= M <= 63
  *      bits   5:0 on RCC_PLLCFGR register
- *
- * setup:
- *    uses 4 on-board LEDs
  */
 
 #include "stm32f4xx.h"
@@ -57,6 +55,8 @@
 /*************************************************
 * function declarations
 *************************************************/
+extern uint32_t SystemCoreClock;
+
 void set_sysclk_to_hse(void);
 void set_sysclk_to_hsi(void);
 void set_sysclk_to_84(void);
@@ -69,7 +69,7 @@ void set_sysclk_to_hse(void)
     SystemInit();
 
     /* Enable HSE (CR: bit 16) */
-    RCC->CR |= ((uint32_t) (1 << 16));
+    RCC->CR |= (1 << 16);
     /* Wait till HSE is ready (CR: bit 17) */
     while(!(RCC->CR & (1 << 17)));
 
@@ -80,17 +80,19 @@ void set_sysclk_to_hse(void)
      * set latency to 0 wait states (ARC:bits 2:0)
      *   see Table 10 on page 80 in RM0090
      */
-    FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (0x0 << 0);
+    FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (0 << 0);
 
     /* Select the HSE as system clock source, (CFGR:bits 1:0)
      * 0b00 - HSI
      * 0b01 - HSE
      * 0b10 - PLL
      */
-    RCC->CFGR &= (uint32_t)~(0x3 << 0);
-    RCC->CFGR |= (0x1 << 0);
+    RCC->CFGR &= ~(3U << 0);
+    RCC->CFGR |=  (1 << 0);
     /* Wait till the main PLL is used as system clock source (CFGR:bits 3:2) */
-    while (!(RCC->CFGR & (uint32_t)(0x1 << 2)));
+    while (!(RCC->CFGR & (1 << 2)));
+
+    SystemCoreClock = HSE_VALUE;
 }
 
 void set_sysclk_to_hsi(void)
@@ -105,7 +107,9 @@ void set_sysclk_to_hsi(void)
      * set latency to 0 wait states (ARC:bits 2:0)
      *   see Table 10 on page 80 in RM0090
      */
-    FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (0x0 << 0);
+    FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (0 << 0);
+
+    SystemCoreClock = HSI_VALUE;
 }
 
 /* set sysclock to 84Mhz
@@ -120,7 +124,7 @@ void set_sysclk_to_84(void)
     uint32_t PLL_P = 4;
 
     /* Enable HSE (CR: bit 16) */
-    RCC->CR |= ((uint32_t) (1 << 16));
+    RCC->CR |= (1 << 16);
     /* Wait till HSE is ready (CR: bit 17) */
     while(!(RCC->CR & (1 << 17)));
 
@@ -129,17 +133,17 @@ void set_sysclk_to_84(void)
     RCC->APB1ENR |= (1 << 28);
 
     /* then set voltage scale to 1 for max frequency (PWR_CR:bit 14)
-     * (0b0) scale 2 for fCLK <= 144 Mhz
-     * (0b1) scale 1 for 144 Mhz < fCLK <= 168 Mhz
+     * (0) scale 2 for fCLK <= 144 Mhz
+     * (1) scale 1 for 144 Mhz < fCLK <= 168 Mhz
      */
     PWR->CR |= (1 << 14);
 
     /* set AHB prescaler to /1 (CFGR:bits 7:4) */
     RCC->CFGR |= (0 << 4);
     /* set ABP low speed prescaler to /4 (APB1) (CFGR:bits 12:10) */
-    RCC->CFGR |= (0x5 << 10);
+    RCC->CFGR |= (5 << 10);
     /* set ABP high speed prescaper to /2 (ABP2) (CFGR:bits 15:13) */
-    RCC->CFGR |= (0x4 << 13);
+    RCC->CFGR |= (4 << 13);
 
     /* Set M, N, P and Q PLL dividers
      * PLLCFGR: bits 5:0 (M), 14:6 (N), 17:16 (P), 27:24 (Q)
@@ -150,7 +154,7 @@ void set_sysclk_to_84(void)
     /* Enable the main PLL (CR: bit 24) */
     RCC->CR |= (1 << 24);
     /* Wait till the main PLL is ready (CR: bit 25) */
-    while((RCC->CR & (1 << 25)) == 0);
+    while(!(RCC->CR & (1 << 25)));
     /* Configure Flash
      * prefetch enable (ACR:bit 8)
      * instruction cache enable (ACR:bit 9)
@@ -158,17 +162,19 @@ void set_sysclk_to_84(void)
      * set latency to 2 wait states (ARC:bits 2:0)
      *   see Table 10 on page 80 in RM0090
      */
-    FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (0x2 << 0);
+    FLASH->ACR = (1 << 8) | (1 << 9) | (1 << 10 ) | (2 << 0);
 
     /* Select the main PLL as system clock source, (CFGR:bits 1:0)
      * 0b00 - HSI
      * 0b01 - HSE
      * 0b10 - PLL
      */
-    RCC->CFGR &= (uint32_t)~(0x3 << 0);
-    RCC->CFGR |= (0x2 << 0);
+    RCC->CFGR &= ~(3U << 0);
+    RCC->CFGR |=  (2  << 0);
     /* Wait till the main PLL is used as system clock source (CFGR:bits 3:2) */
-    while (!(RCC->CFGR & (uint32_t)(0x2 << 2)));
+    while (!(RCC->CFGR & (2 << 2)));
+
+    SystemCoreClock = 84000000;
 }
 
 /*************************************************
@@ -184,11 +190,12 @@ int main(void)
     // enable GPIOD clock
     RCC->AHB1ENR |= (1 << 3);
 
-    GPIOD->MODER &= 0x00FFFFFF;   // Reset bits 31-24 to clear old values
-    GPIOD->MODER |= 0x55000000;   // Set MODER bits to 01 (0101 is 5 in hex)
+    // make LEDs output
+    GPIOD->MODER &= ~(0xFFU << 24);
+    GPIOD->MODER |=  (0x55  << 24);
 
     // Set Pins 12-15 to 1 to turn on all LEDs
-    GPIOD->ODR |= 0xF000;
+    GPIOD->ODR |= (0xF << 12);
 
     while(1)
     {
@@ -225,7 +232,7 @@ int main(void)
         }
 
         delay(500000);
-        GPIOD->ODR ^= 0xF000;
+        GPIOD->ODR ^= (0xF << 12);
     }
 
     return 0;

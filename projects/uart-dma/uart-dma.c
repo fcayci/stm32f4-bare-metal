@@ -139,6 +139,7 @@ int main(void)
     // number of items to be transferred
     DMA1_Stream6->NDTR = sizeof(msg);
 
+    NVIC_SetPriority(DMA1_Stream6_IRQn, 3); // Priority level 3
     NVIC_EnableIRQ(DMA1_Stream6_IRQn);
 
     // enable DMA

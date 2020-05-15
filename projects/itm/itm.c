@@ -25,6 +25,7 @@ void delay(volatile uint32_t);
 // the output is directed to ITM channel 0
 // ITM_SendChar function is defined in CMSIS
 int _write(int file, char *ptr, int len){
+	(void)file;
     int i;
     for (i =0; i<len; i++){
         ITM_SendChar(*ptr++);

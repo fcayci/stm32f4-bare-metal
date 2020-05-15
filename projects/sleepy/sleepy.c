@@ -20,10 +20,6 @@
  *   set sleeponexit bit if desired (return to sleep after interrupt)
  *   execute 'wfi' or 'wfe' instruction
  *   __WFI() and __WFE() in CMSIS
- *
- * setup:
- *    uses 1 on-board LED.
- *    4 LEDs are connected to: PD12, PD13, PD14 and PD15 pins.
  */
 
 #include "stm32f4xx.h"
@@ -46,13 +42,13 @@ void EXTI0_IRQHandler(void)
         i++;
 
         /* an awful debouncer */
-        for(uint32_t j=0; j<1000000; j++);
+        for(int j=0; j<1000000; j++);
 
         // after 5 button press, put the processor in deepsleep
         if (i == 5) {
             SCB->SCR |= (1U << 2); // Enable SleepDeep bit
         }
-        // after 10 buton press return back to nurmal
+        // after 10 button press return back to normal
         else if (i == 10) {
             i = 0;
             SCB->SCR ^= (1 << 1); // Toggle SleepOnExit bit
@@ -95,7 +91,7 @@ int main(void)
     // enable GPIOA clock (AHB1ENR: bit 0)
     RCC->AHB1ENR |= (1 << 0);
     /* Make Pin 0 input (MODER: bits 1:0) */
-    GPIOA->MODER &= ~(0x3U << 0);   // Reset bits 0-1 to clear old values
+    GPIOA->MODER &= ~(3U << 0);   // Reset bits 0-1 to clear old values
 
     // enable SYSCFG clock (APB2ENR: bit 14)
     RCC->APB2ENR |= (1 << 14);
@@ -106,7 +102,7 @@ int main(void)
     // Mask the used external interrupt numbers.
     EXTI->IMR |= 0x00001;    // Mask EXTI0
     // Set Priority for each interrupt request
-    NVIC->IP[EXTI0_IRQn] = 0x10; // Priority level 1
+    NVIC_SetPriority(EXTI0_IRQn, 1); // Priority level 1
     // enable EXT0 IRQ from NVIC
     NVIC_EnableIRQ(EXTI0_IRQn);
 
@@ -122,7 +118,7 @@ int main(void)
     // Update Interrupt Enable
     TIM2->DIER |= (1 << 0);
     // enable TIM2 IRQ from NVIC
-    NVIC->IP[TIM2_IRQn] = 0x20; // Priority level 2
+    NVIC_SetPriority(TIM2_IRQn, 2); // Priority level 2
     NVIC_EnableIRQ(TIM2_IRQn);
     // Enable Timer 2 module (CEN, bit0)
     TIM2->CR1 |= (1 << 0);
@@ -137,14 +133,14 @@ int main(void)
     // sleep
     __WFI(); // wait for interrupt
 
-while(1)
-{
-    // when sleeping, this LED should not blink
-    delay(LEDDELAY);
-    GPIOD->ODR ^= (1 << 12);  // Toggle Green LED
-}
+    while(1)
+    {
+        // when sleeping, this LED should not blink
+        delay(LEDDELAY);
+        GPIOD->ODR ^= (1 << 12);  // Toggle Green LED
+    }
 
-return 0;
+    return 0;
 }
 
 void delay(volatile uint32_t s)

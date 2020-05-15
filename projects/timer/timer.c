@@ -15,9 +15,6 @@
  *   4. (optional) Enable update interrupt from DIER bit 0
  *   5. (optional) Enable TIMx interrupt from NVIC
  *   6. Enable TIMx module from CR1 bit 0
- *
- * setup:
- *    uses 4 on-board LEDs
  */
 
 #include "stm32f4xx.h"
@@ -60,12 +57,11 @@ int main(void)
     /* set system clock to 168 Mhz */
     set_sysclk_to_168();
 
-    // enable GPIOD clock
+    // setup LEDs
     RCC->AHB1ENR |= (1 << 3);
-    GPIOD->MODER &= 0x00FFFFFF;   // Reset bits 31-24 to clear old values
-    GPIOD->MODER |= 0x55000000;   // Set LEDs as output
-
-    GPIOD->ODR = 0x0;
+    GPIOD->MODER &= 0x00FFFFFF;
+    GPIOD->MODER |= 0x55000000;
+    GPIOD->ODR = 0;
 
     // enable TIM2 clock (bit0)
     RCC->APB1ENR |= (1 << 0);
@@ -86,6 +82,7 @@ int main(void)
     // Update Interrupt Enable
     TIM2->DIER |= (1 << 0);
 
+    NVIC_SetPriority(TIM2_IRQn, 2); // Priority level 2
     // enable TIM2 IRQ from NVIC
     NVIC_EnableIRQ(TIM2_IRQn);
 

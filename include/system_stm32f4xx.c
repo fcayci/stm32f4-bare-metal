@@ -3,10 +3,12 @@
  *
  * author: Furkan Cayci
  * description:
- *    this is a custom code for common usage in projects.
+ *    mostly clock related commonly used functions in projects.
  */
 
 #include "system_stm32f4xx.h"
+
+uint32_t SystemCoreClock = HSI_VALUE;
 
 /*************************************************
 * reset clock to HSI
@@ -71,7 +73,7 @@ void set_sysclk_to_168(void)
 	 * Set PLL source to HSE, PLLCFGR: bit 22, 1:HSE, 0:HSI
 	 */
 	RCC->PLLCFGR = PLL_M | (PLL_N << 6) | (((PLL_P >> 1) -1) << 16) |
-				   (PLL_Q << 24) | (1 << 22);
+	               (PLL_Q << 24) | (1 << 22);
 	/* Enable the main PLL (CR: bit 24) */
 	RCC->CR |= (1 << 24);
 	/* Wait till the main PLL is ready (CR: bit 25) */
@@ -94,4 +96,7 @@ void set_sysclk_to_168(void)
 	RCC->CFGR |= (2 << 0);
 	/* Wait till the main PLL is used as system clock source (CFGR:bits 3:2) */
 	while (!(RCC->CFGR & (2U << 2)));
+
+	// update SystemCoreClock variable
+	SystemCoreClock = 168000000;
 }

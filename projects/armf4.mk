@@ -58,6 +58,7 @@ LDFLAGS += -Wl,--gc-sections # linker garbage collector
 LDFLAGS += -Wl,-Map=$(OBJDIR)/$(TARGET).map #generate map file
 LDFLAGS += -Wl,--cref # add symbols to map file
 LDFLAGS += -T$(LINKER_SCRIPT)
+LDFLAGS += $(LIBINCLUDES)
 LDFLAGS += $(LIBS)
 LDFLAGS += -lc
 

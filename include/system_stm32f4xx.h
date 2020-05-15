@@ -7,6 +7,11 @@
 
 #include "stm32f4xx.h"
 
+#define HSI_VALUE    ((uint32_t)16000000U) // Internal high speed oscillator
+#define HSE_VALUE    ((uint32_t)8000000U)  // External high speed oscillator
+#define LSI_VALUE    ((uint32_t)32000U)    // Internal low speed oscillator
+#define LSE_VALUE    ((uint32_t)32768U)    // External low speed oscillator
+
 /* Clock PLLs for 407 chip */
 #if defined (STM32F407xx) || defined (STM32F429xx)
 // Main PLL = N * (source_clock / M) / P

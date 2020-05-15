@@ -16,9 +16,6 @@
  *   5. Mask the selected EXTIs from IMR
  *   6. Set priority for the interrupts from IP
  *   7. Enable the EXTIx interrupt from NVIC
- *
- * setup:
- *    uses 1 on-board push button and 4 LEDs
  */
 
 #include "stm32f4xx.h"
@@ -34,19 +31,19 @@ int main(void);
 *************************************************/
 void EXTI0_IRQHandler(void)
 {
-    static uint8_t i = 1;
+    static uint16_t i = 1;
 
     // Check if the interrupt came from exti0
     if (EXTI->PR & (1 << 0)){
         GPIOD->ODR = (uint16_t)(i << 12);
 
         /* wait little bit */
-        for(uint32_t j=0; j<1000000; j++);
+        for(int j=0; j<1000000; j++);
 
-        if (i == 0x08) {
+        if (8 == i) {
             i = 1;
         } else {
-            i = (uint8_t)(i << 1);
+            i = (uint16_t)(i << 1);
         }
 
         // Clear pending bit
@@ -92,7 +89,7 @@ int main(void)
     EXTI->IMR |= 0x00001;    // Mask EXTI0
 
     // Set Priority for each interrupt request
-    NVIC->IP[EXTI0_IRQn] = 0x10; // Priority level 1
+    NVIC_SetPriority(EXTI0_IRQn, 1); // Priority level 1
 
     // enable EXT0 IRQ from NVIC
     NVIC_EnableIRQ(EXTI0_IRQn);
