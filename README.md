@@ -82,6 +82,7 @@ In order to debug your code, connect your board to the PC, run `st-util` (comes 
 * [uart-tx-int](projects/uart-tx-int/) - UART example with tx interrupt
 * [uart-dma](projects/uart-dma/) - UART tx example with DMA transfer
 * [spi](projects/spi/) - SPI example that is customized for on-board motion sensor (lis302dl version)
+* [i2c](projects/i2c/) - I2C example that communicates with the on-board Audio DAC
 * [wwdg](projects/wwdg/) - Window Watchdog example
 * [itm](projects/itm/) - Message sending through CoreSight ITM port 0
 * [dma](projects/dma/) - Example DMA transfer using memory-to-memory mode

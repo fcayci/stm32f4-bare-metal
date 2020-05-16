@@ -34,8 +34,12 @@ volatile uint32_t dac_value = 0xD00;
 *************************************************/
 void TIM2_IRQHandler(void)
 {
-    // Clear pending bit first
-    TIM2->SR = (uint16_t)(~(1 << 0));
+    // clear interrupt status
+    if (TIM2->DIER & 0x01) {
+        if (TIM2->SR & 0x01) {
+            TIM2->SR &= ~(1U << 0);
+        }
+    }
 
     // update the new value, let timer trgo handle dac
     dac_value += 0x10;
@@ -93,6 +97,7 @@ int main(void)
     // Choose update as master mode (0b010)
     TIM2->CR2 |= (0x2 << 4);
 
+    NVIC_SetPriority(TIM2_IRQn, 2); // Priority level 2
     // enable TIM2 IRQ from NVIC
     NVIC_EnableIRQ(TIM2_IRQn);
 
