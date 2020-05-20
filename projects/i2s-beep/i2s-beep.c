@@ -295,7 +295,7 @@ int main(void)
     uint8_t nem[6] = {0x31, 0x51, 0x71, 0xA1, 0x71, 0x51};
     i2c_write(CS43L22_REG_BEEP_TONE_CFG, 0xC0);
 
-    for (int i=0; i<sizeof(nem); i++) {
+    for (int i=0; i<6; i++) {
         i2c_write(CS43L22_REG_BEEP_FREQ_ON_TIME, nem[i]);
         for (volatile int j=0; j<5000000; j++);
         GPIOD->ODR ^= (1 << 12); // toggle green led
