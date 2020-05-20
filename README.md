@@ -88,4 +88,4 @@ In order to debug your code, connect your board to the PC, run `st-util` (comes 
 * [dma](projects/dma/) - Example DMA transfer using memory-to-memory mode
 * [sleepy](projects/sleepy/) - Low Power mode operations (sleep and stop)
 * [flash](projects/flash/) - Example to show how to write/erase internal flash memory
-* [i2s-beep](projects/i2s-beep/) - I2S example that plays beep sound from on-board Audio DAC using headphone jack
+* [i2s-beep](projects/i2s-beep/) - I2S example that plays a couple notes using the internal beep generator from on-board Audio DAC through audio jack. It does not send any I2S data.

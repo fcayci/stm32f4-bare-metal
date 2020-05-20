@@ -1,5 +1,5 @@
-TARGET = i2c
-SRCS = i2c.c
+TARGET = i2s-beep
+SRCS = i2s-beep.c
 
 LINKER_SCRIPT = ../../flash/STM32F407VGTX_FLASH.ld
 
