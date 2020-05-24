@@ -13,15 +13,19 @@
 #include "system_stm32f4xx.h"
 #include "cs43l22.h"
 
-// magic volume function from st lib
-#define VOLUME_CONVERT(Volume) (((Volume) > 100)? 255:((uint8_t)(((Volume) * 255) / 100)))
-
-volatile uint8_t DeviceAddr = CS43L22_ADDRESS;
-
 /*************************************************
 * function declarations
 *************************************************/
 int main(void);
+void init_i2s_pll();
+void init_i2s3();
+void init_cs43l22(uint8_t);
+void start_cs43l22();
+
+/*************************************************
+* I2C related general functions
+*************************************************/
+volatile uint8_t DeviceAddr = CS43L22_ADDRESS;
 
 static inline void __i2c_start() {
     I2C1->CR1 |= I2C_CR1_START;
@@ -98,52 +102,30 @@ uint8_t i2c_read(uint8_t regaddr) {
     return reg;
 }
 
-void init_cs43l22() {
-    // power off
-    i2c_write(CS43L22_REG_POWER_CTL1, CS43L22_PWR_CTRL1_POWER_DOWN);
-    // headphones on, speakers off
-    i2c_write(CS43L22_REG_POWER_CTL2, 0xAF);
-    // auto detect speed MCLK/2
-    i2c_write(CS43L22_REG_CLOCKING_CTL, 0x81);
-    // slave mode, I2S data format
-    i2c_write(CS43L22_REG_INTERFACE_CTL1, 0x04);
+/*************************************************
+* I2S related functions
+*************************************************/
 
-    // set volume levels to 50. magic functions from st
-    uint8_t convertedvol = VOLUME_CONVERT(50);
-    if(convertedvol > 0xE6)
-    {
-        i2c_write(CS43L22_REG_MASTER_A_VOL, (uint8_t)(convertedvol - 0xE7));
-        i2c_write(CS43L22_REG_MASTER_B_VOL, (uint8_t)(convertedvol - 0xE7));
-    }
-    else
-    {
-        i2c_write(CS43L22_REG_MASTER_A_VOL, (uint8_t)(convertedvol + 0x19));
-        i2c_write(CS43L22_REG_MASTER_B_VOL, (uint8_t)(convertedvol + 0x19));
-    }
-
-    // disable the analog soft ramp
-    i2c_write(CS43L22_REG_ANALOG_ZC_SR_SET, 0);
-    // disable the digital soft ramp
-    i2c_write(CS43L22_REG_MISC_CTL, 0x04);
-    // disable the limiter attack level
-    i2c_write(CS43L22_REG_LIMIT_CTL1, 0);
-    // bass and treble levels
-    i2c_write(CS43L22_REG_TONE_CTL, 0x0F);
-    // pcm volume
-    i2c_write(CS43L22_REG_PCMA_VOL, 0x0A);
-    i2c_write(CS43L22_REG_PCMB_VOL, 0x0A);
-
-    // power on
-    i2c_write(CS43L22_REG_POWER_CTL1, CS43L22_PWR_CTRL1_POWER_UP);
-    // wait little bit
-    for (volatile int i=0; i<500000; i++);
+// enable I2S pll
+void init_i2s_pll() {
+    // enable PLL I2S for 48khz Fs
+    // for VCO = 1Mhz (8Mhz / M = 8Mhz / 8)
+    // I2SxCLK = VCO x N / R
+    // for N = 258, R = 3 => I2SxCLK = 86Mhz
+    RCC->PLLI2SCFGR |= (258 << 6); // N value = 258
+    RCC->PLLI2SCFGR |= (3 << 28); // R value = 3
+    RCC->CR |= (1 << 26); // enable PLLI2SON
+    while(!(RCC->CR & (1 << 27))); // wait until PLLI2SRDY
 }
 
+/* Setup I2S for CS43L22 Audio DAC
+ * Pins are connected to
+ * PC7 - MCLK, PC10 - SCK, PC12 - SD, PA4 - WS
+ */
 void init_i2s3() {
-
     // Setup pins PC7 - MCLK, PC10 - SCK, PC12 - SD, PA4 - WS
-    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN); // enable GPIOA and GPIOC clocks
-    RCC->APB1ENR |= RCC_APB1ENR_SPI3EN; // enable SPI3 clock
+    RCC->AHB1ENR |= (RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN);
+    RCC->APB1ENR |= RCC_APB1ENR_SPI3EN;
     // PC7 alternate function mode MCLK
     GPIOC->MODER   &= ~(3U << 7*2);
     GPIOC->MODER   |= (2 << 7*2);
@@ -165,21 +147,22 @@ void init_i2s3() {
     GPIOA->OSPEEDR |= (3 << 4*2);
     GPIOA->AFR[0]  |= (6 << 4*4);
 
-    // enable PLL I2S for 48khz Fs
-    RCC->PLLI2SCFGR |= (258 << 6); // N value = 258
-    RCC->PLLI2SCFGR |= (3 << 28); // R value = 3
-    RCC->CR |= (1 << 26); // enable PLLI2SON
-    while(!(RCC->CR & (1 << 27))); // wait until PLLI2SRDY
-
     // Configure I2S
     SPI3->I2SCFGR = 0; // reset registers
     SPI3->I2SPR   = 0; // reset registers
     SPI3->I2SCFGR |= (1 << 11); // I2S mode is selected
-    SPI3->I2SCFGR |= (3 << 8);  // I2S config mode, 11 - Master Transmit
-    //SPI2->I2SCFGR |= (0x0 << 7);  // PCM frame sync, 0 - short frame
-    //SPI2->I2SCFGR |= (0x0 << 4);  // I2S standard select, 00 Philips standard, 11 PCM standard
-    //SPI3->I2SCFGR |= (1 << 3);  // Steady state clock polarity, 0 - low, 1 - high
-    //SPI2->I2SCFGR |= (0x0 << 0);  // Channel length, 0 - 16bit, 1 - 32bit
+    // I2S config mode
+    // 10 - Master Transmit
+    // 11 - Master Receive
+    // Since we will just use built-in beep, we can set it up as receive
+    // mode to always activate clock.
+    SPI3->I2SCFGR |= (3 << 8);
+
+    // have no effect
+    SPI3->I2SCFGR |= (0 << 7);  // PCM frame sync, 0 - short frame
+    SPI3->I2SCFGR |= (0 << 4);  // I2S standard select, 00 Philips standard, 11 PCM standard
+    SPI3->I2SCFGR |= (0 << 3);  // Steady state clock polarity, 0 - low, 1 - high
+    SPI3->I2SCFGR |= (0 << 0);  // Channel length, 0 - 16bit, 1 - 32bit
 
     SPI3->I2SPR |= (1 << 9); // Master clock output enable
     // 48 Khz
@@ -189,6 +172,98 @@ void init_i2s3() {
     SPI3->I2SCFGR |= (1 << 10); // I2S enabled
 }
 
+/*************************************************
+* CS43L22 related functions
+*************************************************/
+
+void init_cs43l22(uint8_t an_ch) {
+    // setup reset pin for CS43L22 - GPIOD 4
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+    GPIOD->MODER &= ~(3U << 4*2);
+    GPIOD->MODER |=  (1 << 4*2);
+    // activate CS43L22
+    GPIOD->ODR   |=  (1 << 4);
+
+    uint8_t data;
+    // power off
+    i2c_write(CS43L22_REG_POWER_CTL1, CS43L22_PWR_CTRL1_POWER_DOWN);
+
+    // headphones on, speakers off
+    data = (2 << 6) | (2 << 4) | (3 << 2) | (3 << 0);
+    i2c_write(CS43L22_REG_POWER_CTL2, data);
+
+    // auto detect clock
+    data = (1 << 7);
+    i2c_write(CS43L22_REG_CLOCKING_CTL, data);
+
+    // slave mode, DSP mode disabled, I2S data format, 16-bit data
+    data = (1 << 2) | (3 << 0);
+    i2c_write(CS43L22_REG_INTERFACE_CTL1, data);
+
+    // select ANx as passthrough source based on the parameter passed
+    if ((an_ch > 0) && (an_ch < 5)) {
+        data = (uint8_t)(1 << (an_ch-1));
+    }
+    else {
+        data = 0;
+    }
+    i2c_write(CS43L22_REG_PASSTHR_A_SELECT, data);
+    i2c_write(CS43L22_REG_PASSTHR_B_SELECT, data);
+
+    // ganged control of both channels
+    data = (1 << 7);
+    i2c_write(CS43L22_REG_PASSTHR_GANG_CTL, data);
+
+    // playback control 1
+    // hp gain 0.6, single control, master playback
+    data = (3 << 5) | (1 << 4);
+    i2c_write(CS43L22_REG_PLAYBACK_CTL1, data);
+
+    // misc controls,
+    // passthrough analog enable/disable
+    // passthrough mute/unmute
+    if ((an_ch > 0) && (an_ch < 5)) {
+        data = (1 << 7) | (1 << 6);
+    }
+    else {
+        data = (1 << 5) | (1 << 4); // mute
+    }
+    i2c_write(CS43L22_REG_MISC_CTL, data);
+
+    // passthrough volume
+    data = 0; // 0 dB
+    i2c_write(CS43L22_REG_PASSTHR_A_VOL, data);
+    i2c_write(CS43L22_REG_PASSTHR_B_VOL, data);
+
+    // pcm volume
+    data = 0; // 0 dB
+    i2c_write(CS43L22_REG_PCMA_VOL, data);
+    i2c_write(CS43L22_REG_PCMB_VOL, data);
+
+    start_cs43l22();
+}
+
+void start_cs43l22() {
+    // initialization sequence from the data sheet pg 32
+    // write 0x99 to register 0x00
+    i2c_write(0x00, 0x99);
+    // write 0x80 to register 0x47
+    i2c_write(0x47, 0x80);
+    // write 1 to bit 7 in register 0x32
+    uint8_t data = i2c_read(0x32);
+    data |= (1 << 7);
+    i2c_write(0x32, data);
+    // write 0 to bit 7 in register 0x32
+    data &= (uint8_t)(~(1U << 7));
+    i2c_write(0x32, data);
+    // write 0x00 to register 0x00
+    i2c_write(0, 0x00);
+
+    // power on
+    i2c_write(CS43L22_REG_POWER_CTL1, CS43L22_PWR_CTRL1_POWER_UP);
+    // wait little bit
+    for (volatile int i=0; i<500000; i++);
+}
 
 void I2C1_ER_IRQHandler(){
     // error handler
@@ -266,18 +341,12 @@ int main(void)
 
     I2C1->CR1 |= I2C_CR1_PE; // enable i2c
 
-    // setup I2S3
+    // audio PLL
+    init_i2s_pll();
+    // audio out
     init_i2s3();
-
-    //*******************************
-    // setup reset pin for CS43L22 - GPIOD 4
-    //*******************************
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
-    GPIOD->MODER &= ~(3U << 4*2);
-    GPIOD->MODER |=  (1 << 4*2);
-
-    // activate CS43L22
-    GPIOD->ODR   |=  (1 << 4);
+    // initialize audio dac
+    init_cs43l22(0);
 
     // read Chip ID - first 5 bits of CHIP_ID_ADDR
     uint8_t ret = i2c_read(CS43L22_REG_ID);
@@ -286,10 +355,9 @@ int main(void)
         GPIOD->ODR |= (1 << 13); // orange led on error
     }
 
-    init_cs43l22();
-
     // beep volume
-    i2c_write(CS43L22_REG_BEEP_VOL_OFF_TIME, 0x06);
+    uint8_t vol = (0x1C - 12); // -6 - 12*2 dB
+    i2c_write(CS43L22_REG_BEEP_VOL_OFF_TIME, vol);
 
     // EGBEBG
     uint8_t nem[6] = {0x31, 0x51, 0x71, 0xA1, 0x71, 0x51};
