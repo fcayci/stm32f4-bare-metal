@@ -42,9 +42,11 @@ void DMA2_Stream0_IRQHandler(void)
         // clear stream 0 transfer complete interrupt
         DMA2->LIFCR |= (1 << 5);
         // Check out the destination contents after DMA transfer
-        for (int i=0; i<BUF_SIZE/4; i++){
-            GPIOD->ODR = (uint16_t)(dst_addr[i] << 12);
-            for(volatile int j=1000000; j>0; j--);
+        // ignore last four bits, and only display first four bits
+        // at the destination address
+        for (int i=0; i<BUF_SIZE; i++){
+            GPIOD->ODR = (uint16_t)((dst_addr[i] >> 4) << 12);
+            for(volatile int j=100000; j>0; j--);
         }
     }
 }
@@ -54,17 +56,15 @@ void DMA2_Stream0_IRQHandler(void)
 *************************************************/
 int main(void)
 {
-    /* set system clock to 168 Mhz */
     set_sysclk_to_168();
-
-    /* Enable GPIOD clock (AHB1ENR: bit 3) */
-    RCC->AHB1ENR |= (1 << 3);
-
-    // make leds output
+    /********************************
+     * setup LEDs - GPIOD 12,13,14,15
+     *******************************/
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
     GPIOD->MODER &= ~(0xFFU << 24);
-    GPIOD->MODER |=  (0x55U << 24);
-    // light them up before the storm
-    GPIOD->ODR = (0xF << 12);
+    GPIOD->MODER |= (0x55 << 24);
+    GPIOD->ODR    = (0xF << 12);
+
     // wait a bit
     for(volatile int i=10000000; i>0; i--);
 
@@ -75,12 +75,15 @@ int main(void)
         dst_addr[i] = 0;
     }
 
-    // SETUP DMA2
+    /********************************
+     * setup DMA
+     *******************************/
 
     // enable DMA2 clock, bit 22 on AHB1ENR
     RCC->AHB1ENR |= (1 << 22);
 
-    // clear DMA Stream
+    // clear DMA Stream configuration register
+    // single transfer, M0 is target, single buffer mode, circular buffer disabled
     DMA2_Stream0->CR = 0;
     // wait until dma is disabled
     while(DMA2_Stream0->CR & (1 << 0));
@@ -89,17 +92,20 @@ int main(void)
     DMA2_Stream0->CR |= (0 << 25);
 
     // set data transfer direction DIR: bits7:6 memory-to-memory
-    DMA2_Stream0->CR |= (0x2 << 6);
+    DMA2_Stream0->CR |= (2 << 6);
+
+    // set channel priority PL bits17:16 to medium
+    DMA2_Stream0->CR |= (0x1 << 16);
 
     // increment memory MINC : bit10
     DMA2_Stream0->CR |= (1 << 10);
     // memory data size MSIZE : bits14:13 to byte
-    DMA2_Stream0->CR |= (0x0 << 13);
+    DMA2_Stream0->CR |= (0 << 13);
 
     // increment peripheral PINC : bit9
     DMA2_Stream0->CR |= (1 << 9);
     // peripheral data size PSIZE : bits12:11 to byte
-    DMA2_Stream0->CR |= (0x0 << 11);
+    DMA2_Stream0->CR |= (0 << 11);
 
     // source memory address
     DMA2_Stream0->PAR = (uint32_t)src_addr;
@@ -107,9 +113,6 @@ int main(void)
     DMA2_Stream0->M0AR = (uint32_t)dst_addr;
     // number of items to be transferred
     DMA2_Stream0->NDTR = BUF_SIZE;
-
-    // set channel priority PL bits17:16 to medium
-    DMA2_Stream0->CR |= (0x1 << 16);
 
     // enable transfer complete interrupt bit4
     DMA2_Stream0->CR |= (1 << 4);

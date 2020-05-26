@@ -5,8 +5,7 @@
             "includePath": [
                 "${workspaceRoot}/include",
                 "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include",
-                "${workspaceRoot}/libs/CMSIS_5/CMSIS/DSP/Include",
-                "${workspaceRoot}/libs/libopencm3/include"
+                "${workspaceRoot}/libs/CMSIS_5/CMSIS/DSP/Include"
             ],
             "defines": ["STM32F407xx", "__VFP_FP__", "__ARM_ARCH_7EM__"],
             "intelliSenseMode": "clang-x64",
@@ -14,8 +13,7 @@
                 "path": [
                     "${workspaceRoot}/include",
                     "${workspaceRoot}/libs/CMSIS_5/CMSIS/Core/Include",
-                    "${workspaceRoot}/libs/CMSIS_5/CMSIS/DSP/Include",
-                    "${workspaceRoot}/libs/libopencm3/include"
+                    "${workspaceRoot}/libs/CMSIS_5/CMSIS/DSP/Include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
