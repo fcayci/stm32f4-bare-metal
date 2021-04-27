@@ -14,7 +14,7 @@
  *   4. Choose channel using CHSEL bit. memory-to-memory does not matter
  *      peripheral-to-memory check the table
  *   5. Choose increment mode for both memory and peripheral registers (MINC/PINC)
- *   6. Choose increment size MSIZE/PSIZE
+ *   6. Choose data width via MSIZE/PSIZE
  *   7. Set source/destination memory addresses PAR/M0AR
  *   8. Set number of items to be transferred NDTR
  *   9. Set priority PL
@@ -99,12 +99,12 @@ int main(void)
 
     // increment memory MINC : bit10
     DMA2_Stream0->CR |= (1 << 10);
-    // memory data size MSIZE : bits14:13 to byte
+    // memory data width MSIZE : bits14:13 to byte
     DMA2_Stream0->CR |= (0 << 13);
 
     // increment peripheral PINC : bit9
     DMA2_Stream0->CR |= (1 << 9);
-    // peripheral data size PSIZE : bits12:11 to byte
+    // peripheral data width PSIZE : bits12:11 to byte
     DMA2_Stream0->CR |= (0 << 11);
 
     // source memory address
