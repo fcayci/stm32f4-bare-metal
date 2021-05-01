@@ -1,0 +1,148 @@
+set pagination off
+
+define connect
+    # "TARGET_ADDRESS" is replaced with appropriate value 
+    # via regex in Makefile
+    target extended-remote {{TARGET_ADDRESS}}
+end
+
+define ub
+    update-breakpoints
+end
+document ub
+    Short for "update-breakpoints"
+end
+
+define update-breakpoints
+    shell make gen-breakpoints --no-print-directory
+    delete
+    source breakpoints.txt
+    tb main 
+    #break _unhandled_exception
+    echo Tip: Can be set manually: break Reset_Handler\n
+end
+document update-breakpoints
+    Generate hardcoded breakpoints by using "// debugger" lines
+end
+
+define wwindow
+    shell touch watch-window.txt
+    echo Watch Window: \n
+    echo --------------------------------\n
+    source watch-window.txt
+end
+document wwindow
+    Get pre-defined variable contents from watch-window.txt
+end
+
+define cheatsheet
+    dont-repeat
+    #tui-close
+    shell make help-cmd-debugger --no-print-directory | less
+end
+
+define restart-server
+    echo FORCE RESTARTING GDB SERVER\n
+    disconnect
+    shell make stop-gdb-server --no-print-directory
+    # gdb server will restart by itself in 1 second
+    shell sleep 3s
+    connect
+end
+
+set $use_tui = {{USE_TUI}}
+
+define reload
+    dont-repeat
+    if $use_tui > 0
+        tui-close
+    end
+    echo --------------------------------\n
+    echo +++ compiling code...\n
+    shell make --no-print-directory; echo "set \$retval = $?" > /tmp/gdb-retval
+    source /tmp/gdb-retval
+    shell rm /tmp/gdb-retval
+    if $retval >  0
+        echo !!! compilation failed!\n
+        echo --------------------------------\n
+    else
+        echo +++ flashing the binary...\n
+        # for the application code
+        load {{ELF_FILE}}
+
+        # for the symbol table
+        file {{ELF_FILE}}
+
+        echo done.\n
+
+        # send a hard reset signal through NRST pin
+        reset-mcu
+
+        if $use_tui > 0
+            # display TUI on startup
+            tui-open
+
+            echo ----------------------------------------\n
+            echo ... "reload" when source code is changed\n
+            echo ... "update-breakpoints" ("ub") to refresh the breakpoints\n
+            echo ... "tui-open/tui-close" to show/hide the Terminal UI. \n
+            echo ... "cheatsheet" for full cheatsheet\n
+            echo ----------------------------------------\n
+        end
+        continue
+    end
+end
+
+define reset-mcu
+    monitor reset halt
+    # START STLINK SPECIFIC
+    monitor jtag_reset # send NRST signal, see https://github.com/texane/stlink/issues/774
+    # END STLINK SPECIFIC
+    update-breakpoints
+end
+document reset-mcu
+    Resets MCU state by sending a physical signal to the NRST pin.
+end
+
+define restart-app
+    reset-mcu
+end
+document restart-app
+    Alias for "reset-mcu"
+end
+
+define exit
+    kill
+    quit
+end
+
+define tui-open
+    dont-repeat
+    #layout src
+    #focus cmd
+    tui enable
+
+    echo ------------------------------------------\n
+    echo Close above TUI by "tui-close" command. \n
+    echo ------------------------------------------\n
+end
+document tui-open
+    Show the code around currently hit breakpoint
+end
+
+define tui-close
+    tui disable
+end
+document tui-close
+    Close the Terminal User Interface.
+end
+
+# --- initialize ---
+connect
+if $use_tui > 0
+    reload
+else
+    echo ------------------------\n
+    echo Please manually "reload"\n
+    echo ------------------------\n
+end

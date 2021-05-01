@@ -17,7 +17,7 @@ INCLUDES += -I$(CMSIS)/CMSIS/Core/Include
 CFLAGS += $(CDEFS)
 
 CFLAGS += -mcpu=cortex-m4 -mthumb # processor setup
-CFLAGS += -O0 # optimization is off
+CFLAGS += -O0 -ggdb3 # optimization is off (see https://stackoverflow.com/a/33555202/1952991)
 CFLAGS += -std=gnu11 # use GNU 11 standard
 
 ifeq ($(DEBUG), 1)
@@ -70,6 +70,9 @@ OBJCOPY = $(CROSS_COMPILE)objcopy
 SIZE = $(CROSS_COMPILE)size
 DBG = $(CROSS_COMPILE)gdb
 
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir := $(dir $(mkfile_path))
+
 all: clean $(SRCS) build size
 	@echo "Successfully finished..."
 
@@ -105,9 +108,15 @@ disass: $(TARGET).elf
 disass-all: $(TARGET).elf
 	@$(OBJDUMP) -D $(OBJDIR)/$(TARGET).elf
 
-debug:
-	@$(DBG) --eval-command="target extended-remote :4242" \
-	 $(OBJDIR)/$(TARGET).elf
+__gen_gdb_init:
+	@cat $(mkfile_dir)/gdb-init \
+		| sed "s|{{TARGET_ADDRESS}}|:4242|" \
+    | sed "s|{{ELF_FILE}}|$(OBJDIR)/$(TARGET).elf|" \
+    | sed "s|{{USE_TUI}}|1|" \
+    > /tmp/gdb-init
+
+debug: __gen_gdb_init
+	@$(DBG) -x /tmp/gdb-init
 
 burn:
 	@st-flash write $(OBJDIR)/$(TARGET).bin 0x8000000
@@ -117,3 +126,4 @@ clean:
 	@rm -rf $(OBJDIR)/
 
 .PHONY: all build size clean burn debug disass disass-all
+
